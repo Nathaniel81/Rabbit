@@ -6,9 +6,9 @@ from django_editorjs_fields import EditorJsJSONField
 class Subrabbit(models.Model):
     creator = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=100, unique=True)
-    description = models.CharField(max_length=500)
-    subscribers = models.ManyToManyField(User, related_name='subscriptions')
-    moderators = models.ManyToManyField(User, related_name='moderates')
+    description = models.CharField(max_length=500, blank=True)
+    subscribers = models.ManyToManyField(User, related_name='subscriptions', blank=True)
+    moderators = models.ManyToManyField(User, related_name='moderates', blank=True)
     rules = models.CharField(max_length=500, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
