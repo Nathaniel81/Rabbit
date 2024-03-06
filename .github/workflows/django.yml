@@ -12,7 +12,7 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        python-version: [3.7, 3.8, 3.9]
+        python-version: [3.8, 3.9]
 
     steps:
     - uses: actions/checkout@v3
@@ -24,10 +24,9 @@ jobs:
       run: |
         cd backend
         python -m pip install --upgrade pip
-        pip install -r requirements.txt
+        pip install -r requirements_workflow.txt
     - name: Run Tests
       run: |
-        # Add commands to run your tests here
         echo "Running tests..."
 
   deploy:
