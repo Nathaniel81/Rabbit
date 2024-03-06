@@ -1,13 +1,18 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react-swc'
+// vite.config.ts
 
-// https://vitejs.dev/config/
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react-swc';
+
+
 export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      '/image': 'http://res.cloudinary.com/dpzvkmwpb',
-      '/api': 'http://127.0.0.1:8000'
-    }
-  }
-})
+      '/api': 'http://127.0.0.1:8000',
+      //   '/image/': {
+      //     target: 'http://res.cloudinary.com/dpzvkmwpb',
+      //     changeOrigin: true,
+        // },
+    },
+  },
+});
