@@ -11,4 +11,3 @@ export default defineConfig({
     }
   }
 })
-// http://res.cloudinary.com/dpzvkmwpb/image/upload/v1709720868/shps2g9udkkjncoghedc.jpg
