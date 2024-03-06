@@ -14,6 +14,7 @@ const UsersPage = () => {
     );
 
     // if (error) return 'An error has occurred: ' + error.message;
+    console.log(data)
 
   return (
     <div className='mt-10'>

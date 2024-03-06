@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
+from cloudinary.models import CloudinaryField, CloudinaryResource
 
 
 class CustomUserManager(BaseUserManager):
@@ -25,7 +26,8 @@ class CustomUserManager(BaseUserManager):
 class User(AbstractUser):
     username = models.CharField(max_length=150, unique=True, blank=True)
     email = models.EmailField(unique=True)
-    profile_picture = models.ImageField(upload_to='profile_pictures/', default='no-image.png', null=True, blank=True)
+    # profile_picture = models.ImageField(upload_to='profile_pictures/', default='no-image.png', null=True, blank=True)
+    profile_picture = CloudinaryField('image', null=True, blank=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
