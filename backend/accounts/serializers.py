@@ -4,6 +4,7 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()
+
 class UserSerializer(serializers.ModelSerializer):
     profile_picture = serializers.SerializerMethodField()
 

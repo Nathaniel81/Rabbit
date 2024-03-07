@@ -17,7 +17,7 @@ const UsersPage = () => {
     console.log(data)
     // const xx = 'dd';
   return (
-    <div className='mt-10'>
+    <div className='mt-10 box'>
         {isLoading ? 'Loading...' : (
           <>
             {data?.map((user: User) => (
