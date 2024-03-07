@@ -2,9 +2,9 @@ import { QueryClient, QueryClientProvider } from 'react-query';
 import { HashRouter as Router, Route, Routes } from 'react-router-dom';
 
 import HomePage from './pages/HomePage';
-import LoginPage from './pages/LoginPage';
 import UsersPage from './pages/UsersPage';
 
+import AuthenticationModal from './components/AuthenticationModal';
 import Navbar from './components/Navbar';
 
 
@@ -17,10 +17,11 @@ function App() {
             <Navbar />
             <Routes>
               <Route path="/" element={<HomePage />} />
-              <Route path="/sign-in" element={<LoginPage />} />
+              {/* <Route path="/sign-in" element={<SignInPage />} /> */}
               <Route path="/users" element={<UsersPage />} />
             </Routes>
         </Router>
+        <AuthenticationModal />
     </QueryClientProvider>
   )
 }

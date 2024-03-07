@@ -1,4 +1,5 @@
 import { useQuery } from 'react-query';
+// import { Link } from 'react-router-dom';
 
 interface Rabbit {
   id: string,
@@ -16,7 +17,7 @@ function HomePage() {
   
   return (
     <>
-      <div className='mt-10'>
+      <div className='mt-20 box'>
         {isLoading ? 'Loading...' : (
           <>
             {data?.map((rabbit: Rabbit) => (
