@@ -97,6 +97,13 @@ TEMPLATES = [
     },
 ]
 
+JWT_AUTH_COOKIE = 'access_token'
+JWT_AUTH_REFRESH_COOKIE = 'refresh_token'
+JWT_AUTH_SECURE = True
+JWT_AUTH_SAMESITE = 'None'
+
+
+
 WSGI_APPLICATION = 'rabbit.wsgi.application'
 AUTH_USER_MODEL = 'accounts.User'
 
