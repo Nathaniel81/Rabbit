@@ -25,10 +25,6 @@ class GetAllUsers(generics.ListAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
-    def get(self, request):
-        token = request.COOKIES.get('access_token')
-        serializer = self.serializer_class(data=request.data)
-        return Response({})
 
 class GithubOauthSignInView(APIView):
     serializer_class = GithubLoginSerializer

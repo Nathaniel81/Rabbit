@@ -1,57 +1,28 @@
-// import { useQuery } from 'react-query';
-import { Link, useNavigate } from "react-router-dom";
-// import { useParams } from 'react-router-dom';
-import {useEffect } from 'react'
-import { useSearchParams } from "react-router-dom";
-import axios from 'axios';
-
-interface Rabbit {
-  id: string,
-  name: string
-}
-
-
+import { loginWithGithub } from '@/redux/slices/authSlice';
+import { AppDispatch } from '@/redux/store';
+import { useEffect } from 'react';
+import { useSelector, useDispatch} from 'react-redux'
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { RootState } from '@/redux/store';
 
 function HomePage() {
   const [searchparams] = useSearchParams();
+  const dispatch = useDispatch<AppDispatch>();
+  const code = searchparams.get('code');
   const navigate = useNavigate();
-  
-  const code = searchparams.get('code')
-  console.log('Code: ', code)
 
-  const send_github__code_to_server = async () => {  
+  const userLogin = useSelector((state: RootState) => state.userInfo);
+  const { user, loading, error } = userLogin;
 
-    if (searchparams) {
-        try {
-        const urlparam = searchparams.get('code')
-        const resp = await axios.post('/api/user/auth/github/', {'code':urlparam})
-        const result = resp.data
+  console.log(user, error)
 
-        console.log('server res: ', result)
 
-        if (resp.status===200) {
-            const user ={
-            'email':result.email,
-            'username':result.username
-            }
-            localStorage.setItem('user', JSON.stringify(user))
-            navigate('/')
-        }
-
-      } catch (error) {
-        if (error.response) {
-            console.log(error.response.data);
-          } 
-        }  
-      }
-    }
-
-  
   useEffect(() => {
     if (code) {
-       send_github__code_to_server()  
-    }   
-  }, [code])
+      dispatch(loginWithGithub(code));
+      navigate('/')
+    }
+  }, [code, dispatch, navigate]);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -63,24 +34,10 @@ function HomePage() {
     }
   }, []);
 
+  if (loading) <div className='mt-16'>Loading..</div>
 
-  
   return (
     <>
-      <div className='mt-20 box'>
-        {/* {isLoading ? 'Loading...' : (
-          <>
-            {data?.map((rabbit: Rabbit) => (
-              <h1 key={rabbit.id}>{rabbit.name}</h1>
-            ))}
-          </>
-        )} */}
-        <div>
-          <Link to='/users'>
-            Users
-          </Link>
-        </div>
-      </div>
     </>
   );
 }

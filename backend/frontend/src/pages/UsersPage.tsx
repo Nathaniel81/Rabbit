@@ -1,8 +1,6 @@
 import { useQuery } from 'react-query';
 import axios from 'axios';
 
-
-
 interface User {
   id: string,
   email: string,
@@ -12,36 +10,25 @@ interface User {
 const UsersPage = () => {
 
 
-  const { isLoading, error, data } = useQuery('users', async () => {
-    try {
+  const { isLoading, data } = useQuery('users', async () => {
       const response = await axios.get('/api/user/', {
-        // headers: {
-        //   'Content-Type': 'application/json',
-        //   Authorization: `Bearer YOUR_ACCESS_TOKEN`, // Include your access token here
-        // },
-        // withCredentials: true,
+        withCredentials: true,
         headers: {
           "Content-Type": "application/json",
         },
-      });
-  
+      });  
       console.log('Response data:', response.data);
       return response.data;
-    } catch (error) {
-      console.error('Error:', error.message);
-      throw error;
-    }
   });
   
 
   console.log(data);
     
   if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error.message}</div>;
 
   return (
     <div className='mt-10 box'>
-      {/* {data && (
+      {data && (
         <>
           {data.map((user: User) => (
             <div key={user.id}>
@@ -50,7 +37,7 @@ const UsersPage = () => {
             </div> 
           ))}
         </>
-      )} */}
+      )}
     </div>
   );
 }
