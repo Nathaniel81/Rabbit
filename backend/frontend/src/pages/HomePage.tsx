@@ -16,7 +16,7 @@ function HomePage() {
   const [searchparams] = useSearchParams();
   const navigate = useNavigate();
   
-  const code =searchparams.get('code')
+  const code = searchparams.get('code')
   console.log('Code: ', code)
 
   const send_github__code_to_server = async () => {  
@@ -48,10 +48,7 @@ function HomePage() {
 
   
   useEffect(() => {
-    console.log('Effect')
     if (code) {
-      console.log('Code')
-
        send_github__code_to_server()  
     }   
   }, [code])
