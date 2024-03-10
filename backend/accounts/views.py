@@ -1,26 +1,31 @@
 import requests
+from accounts.authenticate import CustomAuthentication
 from django.conf import settings
-from rest_framework import serializers, status
+from django.contrib.auth import authenticate
+from django.core.exceptions import ValidationError
+from django.middleware import csrf
+from rest_framework import exceptions, generics, serializers, status
 from rest_framework.exceptions import AuthenticationFailed
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework import generics
-from rest_framework.permissions import IsAuthenticated
-
-# from .permissions import IsAuthenticated
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 from .models import User
 from .serializers import GithubLoginSerializer, UserSerializer
 
+
 class GetAllUsers(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
+    authentication_classes = [CustomAuthentication]
 
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
     def get(self, request):
         token = request.COOKIES.get('access_token')
-        print(token)
         serializer = self.serializer_class(data=request.data)
         return Response({})
 
@@ -43,21 +48,27 @@ class GithubOauthSignInView(APIView):
                 }, status=status.HTTP_200_OK)
 
                 response.set_cookie(
-                    key='access_token',
-                    value=access_token,
-                    httponly=True,
-                    secure=settings.JWT_AUTH_SECURE,
-                    samesite=settings.JWT_AUTH_SAMESITE,
+                    key = settings.SIMPLE_JWT['AUTH_COOKIE'],
+                    value = access_token,
+                    expires = settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME'],
+                    secure = settings.SIMPLE_JWT['AUTH_COOKIE_SECURE'],
+                    httponly = settings.SIMPLE_JWT['AUTH_COOKIE_HTTP_ONLY'],
+                    samesite = settings.SIMPLE_JWT['AUTH_COOKIE_SAMESITE']
                 )
 
                 response.set_cookie(
-                    key='refresh_token',
-                    value=refresh_token,
-                    httponly=True,
-                    secure=settings.JWT_AUTH_SECURE,
-                    samesite=settings.JWT_AUTH_SAMESITE,
+                    key = settings.SIMPLE_JWT['AUTH_COOKIE_REFRESH'],
+                    value = refresh_token,
+                    expires = settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME'],
+                    secure = settings.SIMPLE_JWT['AUTH_COOKIE_SECURE'],
+                    httponly = settings.SIMPLE_JWT['AUTH_COOKIE_HTTP_ONLY'],
+                    samesite = settings.SIMPLE_JWT['AUTH_COOKIE_SAMESITE']
                 )
+
+                csrf.get_token(request)
+
                 return response
+
             else:
                 return Response("No access token found in the response", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         return Response(serializer.errors, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

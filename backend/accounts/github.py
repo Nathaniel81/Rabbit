@@ -29,7 +29,9 @@ class Github():
     @staticmethod
     def get_github_user(access_token):
         try:
-            headers = {'Authorization': f'Bearer {access_token}'}
+            headers = {
+                'Authorization': f'Bearer {access_token}'
+            }
             resp = requests.get('https://api.github.com/user', headers=headers)
             user_data = resp.json()
             return user_data
@@ -40,7 +42,7 @@ class Github():
     def get_github_emails(access_token):
         try:
             headers = {
-                'Authorization': f'Bearer {access_token}',
+                'Authorization': f'Bearer {access_token}'
             }
             resp = requests.get('https://api.github.com/user/emails', headers=headers)
             emails_data = resp.json()

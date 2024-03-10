@@ -18,6 +18,7 @@ def enforce_csrf(request):
     """
     Enforce CSRF validation.
     """
+
     check = CSRFCheck(get_response=request)
     check.process_request(request)
     reason = check.process_view(request, None, (), {})

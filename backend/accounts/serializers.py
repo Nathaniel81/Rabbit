@@ -23,6 +23,13 @@ class UserSerializer(serializers.ModelSerializer):
     def get_profile_picture(self, obj):
         return f"https://res.cloudinary.com/{os.getenv('CLOUDINARY_NAME')}/{obj.profile_picture}"
 
+def get_tokens_for_user(user):
+    refresh = RefreshToken.for_user(user)
+    return {
+        'refresh': str(refresh),
+        'access': str(refresh.access_token),
+    }
+
 class GithubLoginSerializer(serializers.Serializer):
     code = serializers.CharField()
     
@@ -43,12 +50,16 @@ class GithubLoginSerializer(serializers.Serializer):
                 user.email = email
                 user.save()
             except User.DoesNotExist:
-                user = User.objects.create_user(username=github_username, email='bekele@email.com')
+                user = User.objects.create_user(username=github_username, email=email)
 
-            refresh = RefreshToken.for_user(user)
+            token = get_tokens_for_user(user)
+
+            access_token = token["access"]
+            refresh_token = token["refresh"]
+
             return {
-                'access_token': str(refresh.access_token),
-                'refresh_token': str(refresh),
+                'access_token': access_token,
+                'refresh_token': refresh_token,
                 'user_id': user.id,
                 'username': github_username,
                 'email': email,
