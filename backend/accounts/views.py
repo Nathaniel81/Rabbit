@@ -12,6 +12,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt import tokens
 
 from .models import User
 from .serializers import GithubLoginSerializer, UserSerializer
@@ -109,3 +110,24 @@ class RefreshTokenView(APIView):
             return response
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+class LogoutView(APIView):
+    def post(self, request):
+        try:
+            refreshToken = request.COOKIES.get(
+                settings.SIMPLE_JWT['AUTH_COOKIE_REFRESH'])
+            print(refreshToken)
+            token = tokens.RefreshToken(refreshToken)
+            token.blacklist()
+
+            response = Response()
+            response.delete_cookie(settings.SIMPLE_JWT['AUTH_COOKIE'])
+            response.delete_cookie(settings.SIMPLE_JWT['AUTH_COOKIE_REFRESH'])
+            response.delete_cookie("X-CSRFToken")
+            response.delete_cookie("csrftoken")
+            response["X-CSRFToken"]=None
+        
+            return response
+        except Exception as e:
+            print(e)
+            raise exceptions.ParseError("Invalid token")
