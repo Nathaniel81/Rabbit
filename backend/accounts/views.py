@@ -72,3 +72,40 @@ class GithubOauthSignInView(APIView):
             else:
                 return Response("No access token found in the response", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         return Response(serializer.errors, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class RefreshTokenView(APIView):
+    def post(self, request):
+        refresh_token = request.COOKIES.get(settings.SIMPLE_JWT['AUTH_COOKIE_REFRESH'])
+
+        if not refresh_token:
+            return Response({'error': 'Refresh token is missing'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        try:
+            token = RefreshToken(refresh_token)
+            new_access_token = str(token.access_token)
+            new_refresh_token = str(token)
+            
+            response = Response({'access_token': new_access_token, 'refresh_token': new_refresh_token})
+
+            response.set_cookie(
+                key=settings.SIMPLE_JWT['AUTH_COOKIE'],
+                value=new_access_token,
+                expires=settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME'],
+                secure=settings.SIMPLE_JWT['AUTH_COOKIE_SECURE'],
+                httponly=settings.SIMPLE_JWT['AUTH_COOKIE_HTTP_ONLY'],
+                samesite=settings.SIMPLE_JWT['AUTH_COOKIE_SAMESITE']
+            )
+            response.set_cookie(
+                key=settings.SIMPLE_JWT['AUTH_COOKIE_REFRESH'],
+                value=new_refresh_token,
+                expires=settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME'],
+                secure=settings.SIMPLE_JWT['AUTH_COOKIE_SECURE'],
+                httponly=settings.SIMPLE_JWT['AUTH_COOKIE_HTTP_ONLY'],
+                samesite=settings.SIMPLE_JWT['AUTH_COOKIE_SAMESITE']
+            )
+
+            csrf.get_token(request)
+            # response["X-CSRFToken"] = request.COOKIES.get("csrftoken")
+            return response
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
