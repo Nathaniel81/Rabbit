@@ -14,6 +14,7 @@ from pathlib import Path
 import os
 import dj_database_url
 from dotenv import load_dotenv
+from datetime import timedelta
 
 import cloudinary
 import cloudinary.uploader
@@ -36,7 +37,11 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOWED_ORIGINS = [
+  "http://localhost:5173",  
+]
+
+CORS_ALLOW_CREDENTIALS = True
 
 # Application definition
 
@@ -54,7 +59,8 @@ INSTALLED_APPS = [
     'cloudinary',
 
     'accounts',
-    'core'
+    'core',
+    'rest_framework_simplejwt.token_blacklist',
 ]
 
 # Cloudinary - Django Integration
@@ -82,7 +88,6 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            # os.path.join(BASE_DIR, 'staticfiles/')
             os.path.join(BASE_DIR, 'frontend/dist/')
         ],
         'APP_DIRS': True,
@@ -97,12 +102,53 @@ TEMPLATES = [
     },
 ]
 
-JWT_AUTH_COOKIE = 'access_token'
-JWT_AUTH_REFRESH_COOKIE = 'refresh_token'
-JWT_AUTH_SECURE = True
-JWT_AUTH_SAMESITE = 'None'
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+}
+
+SIMPLE_JWT = {
+  'ACCESS_TOKEN_LIFETIME': timedelta(seconds=45),
+  'REFRESH_TOKEN_LIFETIME': timedelta(days=2),
+  'ROTATE_REFRESH_TOKENS': False,
+  'BLACKLIST_AFTER_ROTATION': True,
+  'UPDATE_LAST_LOGIN': False,
+
+  'ALGORITHM': 'HS256',
+  'SIGNING_KEY': SECRET_KEY,
+  'VERIFYING_KEY': None,
+  'AUDIENCE': None,
+  'ISSUER': None,
+
+  'AUTH_HEADER_TYPES': ('Bearer',),
+  'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
+  'USER_ID_FIELD': 'id',
+  'USER_ID_CLAIM': 'user_id',
+  'USER_AUTHENTICATION_RULE': 'rest_framework_simplejwt.authentication.default_user_authentication_rule',
+
+  'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+  'TOKEN_TYPE_CLAIM': 'token_type',
+
+  'JTI_CLAIM': 'jti',
+
+  'SLIDING_TOKEN_REFRESH_EXP_CLAIM': 'refresh_exp',
+  'SLIDING_TOKEN_LIFETIME': timedelta(minutes=5),
+  'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
+
+  # custom
+  'AUTH_COOKIE': 'access_token',
+  'AUTH_COOKIE_REFRESH': 'refresh_token',
+  'AUTH_COOKIE_DOMAIN': None,
+  'AUTH_COOKIE_SECURE': False,
+  'AUTH_COOKIE_HTTP_ONLY' : True,
+  'AUTH_COOKIE_PATH': '/',
+  'AUTH_COOKIE_SAMESITE': 'Lax',
+}
 
 
+GITHUB_CLIENT_ID=os.getenv('GITHUB_CLIENT_ID'),
+GITHUB_SECRET=os.getenv('GITHUB_SECRET'),
 
 WSGI_APPLICATION = 'rabbit.wsgi.application'
 AUTH_USER_MODEL = 'accounts.User'
@@ -110,18 +156,18 @@ AUTH_USER_MODEL = 'accounts.User'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-
-database_url = os.getenv('DATABASE_URL')
-
 DATABASES = {
-    'default': dj_database_url.parse(database_url)
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
 }
+
+# database_url = os.getenv('DATABASE_URL')
+
+# DATABASES = {
+#     'default': dj_database_url.parse(database_url)
+# }
 
 
 # Password validation

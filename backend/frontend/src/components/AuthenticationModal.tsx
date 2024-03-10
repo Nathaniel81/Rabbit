@@ -25,6 +25,10 @@ const AuthenticationModal: FC = () => {
     const openSignUp = (type: string) => {
         dispatch(openModal(type));
     }
+    const handleLoginWithGithub = () => {
+        console.log('X')
+        window.location.assign(`https://github.com/login/oauth/authorize/?client_id=5dcc33b0caf89cf4435d&scope=user:email`)
+    }
 
     if (!isOpen) {
         return null;
@@ -60,7 +64,7 @@ const AuthenticationModal: FC = () => {
                                 type='button'
                                 size='sm'
                                 className='w-full'
-                                onClick={() => {}}
+                                onClick={() => handleLoginWithGithub()}
                                 disabled={isLoading}>
                                 {isLoading ? null : <Icons.github className='h-4 w-4 mr-2' />}
                                 Github
