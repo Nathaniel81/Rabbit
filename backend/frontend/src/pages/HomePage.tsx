@@ -2,7 +2,7 @@ import { loginWithGithub } from '@/redux/slices/authSlice';
 import { AppDispatch } from '@/redux/store';
 import { useEffect } from 'react';
 import { useSelector, useDispatch} from 'react-redux'
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { RootState } from '@/redux/store';
 
 
@@ -13,11 +13,9 @@ function HomePage() {
   const navigate = useNavigate();
 
   const userLogin = useSelector((state: RootState) => state.userInfo);
-  const { user, loading, error } = userLogin;
+  const { loading } = userLogin;
 
-  console.log(user, error)
-
-
+  
   useEffect(() => {
     if (code) {
       dispatch(loginWithGithub(code));
@@ -37,9 +35,12 @@ function HomePage() {
 
   if (loading) <div className='mt-16'>Loading..</div>
 
-  return (
-    <>
-    </>
+  return (    
+    <div className='mt-20 box'>
+      <Link to='users/'>
+        Users
+      </Link>
+    </div>
   );
 }
 

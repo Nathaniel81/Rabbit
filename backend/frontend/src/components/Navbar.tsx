@@ -16,7 +16,7 @@ import { resetUserInfo } from '@/redux/slices/authSlice';
 import { AppDispatch } from '@/redux/store';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/useToast';
 import { useEffect } from 'react';
 
 
