@@ -114,10 +114,18 @@ class LogoutView(APIView):
         try:
             refreshToken = request.COOKIES.get(
                 settings.SIMPLE_JWT['AUTH_COOKIE_REFRESH'])
-            print(refreshToken)
             token = tokens.RefreshToken(refreshToken)
             token.blacklist()
 
+            response = Response({'LoggedOut'})
+            response.delete_cookie(settings.SIMPLE_JWT['AUTH_COOKIE'])
+            response.delete_cookie(settings.SIMPLE_JWT['AUTH_COOKIE_REFRESH'])
+            response.delete_cookie("X-CSRFToken")
+            response.delete_cookie("csrftoken")
+            response["X-CSRFToken"]=None
+        
+            return response
+        except tokens.TokenError as e:
             response = Response({'LoggedOut'})
             response.delete_cookie(settings.SIMPLE_JWT['AUTH_COOKIE'])
             response.delete_cookie(settings.SIMPLE_JWT['AUTH_COOKIE_REFRESH'])
