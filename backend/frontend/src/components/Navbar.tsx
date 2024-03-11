@@ -12,16 +12,45 @@ import { Link } from 'react-router-dom';
 import { Icons } from './Icons';
 import { Avatar, AvatarFallback } from './ui/Avatar';
 import { buttonVariants } from './ui/Button';
+import { resetUserInfo } from '@/redux/slices/authSlice';
+import { AppDispatch } from '@/redux/store';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { useToast } from '@/hooks/use-toast';
+import { useEffect } from 'react';
+
 
 
 const Navbar = () => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
   const userLogin = useSelector((state: RootState) => state.userInfo);
   const { user } = userLogin;
+  const { toast } = useToast()
 
   const signIn = () => {
     dispatch(openModal('signin'))
   }
+
+  const logoutHandler = () => {
+    axios.post('/api/user/logout/')
+      .then(response => {
+        console.log('Logged out successfully', response.data);
+        localStorage.removeItem('userInfo')
+        dispatch(resetUserInfo())
+        navigate('/')
+      })
+      .catch(error => {
+        console.error('Logout failed:', error);
+        toast({
+          title: "Logout Failed",
+          description: "There was a problem logging out. Please try again later.",
+          variant: 'destructive',
+        })
+      });
+  };
+
+  useEffect(() => {}, [user])
 
   return (
       <div className='fixed top-0 inset-x-0 h-fit bg-zinc-100 border-b border-zinc-300 z-[10] py-2'>
@@ -79,7 +108,9 @@ const Navbar = () => {
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
-                    <Link to='/logout'>Logout</Link>
+                    <span onClick={logoutHandler}>
+                      Logout
+                    </span>
               </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

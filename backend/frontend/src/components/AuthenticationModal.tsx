@@ -63,7 +63,7 @@ const AuthenticationModal: FC = () => {
                                 type='button'
                                 size='sm'
                                 className='w-full'
-                                onClick={() => handleLoginWithGithub()}
+                                onClick={handleLoginWithGithub}
                                 disabled={isLoading}>
                                 {isLoading ? null : <Icons.github className='h-4 w-4 mr-2' />}
                                 Github

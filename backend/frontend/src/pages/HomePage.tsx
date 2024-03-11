@@ -5,6 +5,7 @@ import { useSelector, useDispatch} from 'react-redux'
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { RootState } from '@/redux/store';
 
+
 function HomePage() {
   const [searchparams] = useSearchParams();
   const dispatch = useDispatch<AppDispatch>();

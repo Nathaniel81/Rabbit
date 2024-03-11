@@ -45,7 +45,9 @@ export const loginWithGithub = createAsyncThunk(
 const authSlice = createSlice({
   name: 'auth',
   initialState,
-  reducers: {},
+  reducers: {
+    resetUserInfo: () => initialState,
+  },
   extraReducers: (builder) => {
     builder
       .addCase(loginWithGithub.pending, (state) => {
@@ -67,3 +69,4 @@ const authSlice = createSlice({
 });
 
 export default authSlice.reducer;
+export const { resetUserInfo } = authSlice.actions;
