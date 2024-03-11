@@ -15,15 +15,14 @@ interface AuthState {
 }
 
 const initialState: AuthState = {
-  user:localStorage.getItem('userInfo') ?
-  JSON.parse(localStorage.getItem('userInfo') as string) : null,
+  user: localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo') as string) : null,
   loading: false,
   error: null,
 };
 
 export const loginWithGithub = createAsyncThunk(
   'auth/loginWithGithub',
-  async (code: string , { rejectWithValue }) => {
+  async (code: string, { rejectWithValue }) => {
     try {
       const resp = await axios.post('/api/user/auth/github/', { code });
       const result = resp.data;
@@ -58,14 +57,12 @@ const authSlice = createSlice({
         state.user = action.payload;
         state.error = null;
       })
-      // eslint-disable-next-line
-      // @ts-ignore
-      .addCase(loginWithGithub.rejected, (state, action: PayloadAction<string>) => {
+      .addCase(loginWithGithub.rejected, (state, action: PayloadAction<unknown>) => {
         state.loading = false;
         state.user = null;
-        state.error = action.payload || null;
+        state.error = action.payload ? String(action.payload) : null;
       });
-  }
+  },
 });
 
 export default authSlice.reducer;
