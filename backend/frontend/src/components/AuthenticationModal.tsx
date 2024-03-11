@@ -26,7 +26,6 @@ const AuthenticationModal: FC = () => {
         dispatch(openModal(type));
     }
     const handleLoginWithGithub = () => {
-        console.log('X')
         window.location.assign(`https://github.com/login/oauth/authorize/?client_id=5dcc33b0caf89cf4435d&scope=user:email`)
     }
 

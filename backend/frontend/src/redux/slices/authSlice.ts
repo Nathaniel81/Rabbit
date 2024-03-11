@@ -5,6 +5,7 @@ interface User {
   user_id: string;
   username: string;
   email: string;
+  profile_picture: string;
 }
 
 interface AuthState {
@@ -14,7 +15,8 @@ interface AuthState {
 }
 
 const initialState: AuthState = {
-  user: null,
+  user:localStorage.getItem('userInfo') ?
+  JSON.parse(localStorage.getItem('userInfo') as string) : null,
   loading: false,
   error: null,
 };
@@ -28,9 +30,10 @@ export const loginWithGithub = createAsyncThunk(
       const user: User = {
         user_id: result.user_id,
         username: result.username,
-        email: result.email
+        email: result.email,
+        profile_picture: result.profile_picture,
       };
-      localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem('userInfo', JSON.stringify(user));
       return user;
     } catch (error) {
       const err = error as AxiosError;

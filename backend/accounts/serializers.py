@@ -18,7 +18,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = '__all__'
+        fields = ('id', 'username', 'email', 'profile_picture',)
 
     def get_profile_picture(self, obj):
         return f"https://res.cloudinary.com/{os.getenv('CLOUDINARY_NAME')}/{obj.profile_picture}"
@@ -52,17 +52,23 @@ class GithubLoginSerializer(serializers.Serializer):
             except User.DoesNotExist:
                 user = User.objects.create_user(username=github_username, email=email)
 
+            serialized_user = UserSerializer(user).data
+
             token = get_tokens_for_user(user)
 
             access_token = token["access"]
             refresh_token = token["refresh"]
 
-            return {
-                'access_token': access_token,
-                'refresh_token': refresh_token,
-                'user_id': user.id,
-                'username': github_username,
-                'email': email,
-            }
+            serialized_user['access_token'] = access_token
+            serialized_user['refresh_token'] = refresh_token
+
+            # return {
+            #     'access_token': access_token,
+            #     'refresh_token': refresh_token,
+            #     'user_id': user.id,
+            #     'username': github_username,
+            #     'email': email,
+            # }
+            return serialized_user
         else:
             raise serializers.ValidationError("Unable to fetch access token from GitHub.")

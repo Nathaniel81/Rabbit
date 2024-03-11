@@ -1,18 +1,27 @@
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/DropdownMenu';
+import { openModal } from '@/redux/slices/modalSlice';
+import { RootState } from '@/redux/store';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { Icons } from './Icons';
+import { Avatar, AvatarFallback } from './ui/Avatar';
 import { buttonVariants } from './ui/Button';
-import { openModal } from '@/redux/slices/modalSlice'
-import { useDispatch } from 'react-redux'
 
 
 const Navbar = () => {
-  const userInfo = false;
   const dispatch = useDispatch();
+  const userLogin = useSelector((state: RootState) => state.userInfo);
+  const { user } = userLogin;
 
   const signIn = () => {
     dispatch(openModal('signin'))
   }
-
 
   return (
       <div className='fixed top-0 inset-x-0 h-fit bg-zinc-100 border-b border-zinc-300 z-[10] py-2'>
@@ -23,9 +32,58 @@ const Navbar = () => {
           </Link>
         <div className="flex justify-between gap-5">
           {/* <SearchBar /> */}
-          {userInfo ? (
-          // <UserAccountNav />
-          <div>HHH</div>
+          {user ? (
+            <>
+              <DropdownMenu>
+                <DropdownMenuTrigger>
+                  <Avatar className='h-8 w-8 '>
+                    {user?.profile_picture ? (
+                      <div className='relative aspect-square h-full w-full'>
+                        <img
+                          src={user?.profile_picture}
+                          alt='profile picture'
+                          referrerPolicy='no-referrer'
+                          className='h-full object-cover'
+                        />
+                      </div>
+                    ) : (
+                      <AvatarFallback>
+                        <span className='sr-only'>{user?.username}</span>
+                        <Icons.user className='h-4 w-4' />
+                      </AvatarFallback>
+                    )}
+                  </Avatar>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className='bg-white' align='end'>
+                  <div className='flex items-center justify-start gap-2 p-2'>
+                    <div className='flex flex-col space-y-1 leading-none'>
+                      {user?.username && <p className='font-medium'>{user?.username}</p>}
+                      {user?.email && (
+                        <p className='w-[200px] truncate text-sm text-muted-foreground'>
+                          {user?.email}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link to='/'>Feed</Link>
+                  </DropdownMenuItem>
+          
+                  <DropdownMenuItem asChild>
+                    <Link to='/r/create'>Create Community</Link>
+                  </DropdownMenuItem>
+          
+                  <DropdownMenuItem asChild>
+                    <Link to='/settings'>Settings</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link to='/logout'>Logout</Link>
+              </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </>
           ) : (
             <div className={`${buttonVariants()} cursor-pointer`}
             onClick={signIn}>

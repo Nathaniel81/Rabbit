@@ -34,14 +34,16 @@ class GithubOauthSignInView(APIView):
         if serializer.is_valid():
             data = serializer.validated_data
             code_data = data.get('code')
+            print(code_data)
             access_token = code_data.get('access_token')
             refresh_token = code_data.get('refresh_token')
 
             if access_token and refresh_token:
                 response = Response({
-                    'user_id': code_data.get('user_id'),
+                    'user_id': code_data.get('id'),
                     'username': code_data.get('username'),
                     'email': code_data.get('email'),
+                    'profile_picture': code_data.get('profile_picture')
                 }, status=status.HTTP_200_OK)
 
                 response.set_cookie(
