@@ -10,7 +10,6 @@ import { resetUserInfo } from '@/redux/slices/authSlice';
 import { openModal } from '@/redux/slices/modalSlice';
 import { AppDispatch, RootState } from '@/redux/store';
 import axios from 'axios';
-import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { Icons } from './Icons';
@@ -35,8 +34,8 @@ const Navbar = () => {
       .then(response => {
         console.log('Logged out successfully', response.data);
         localStorage.removeItem('userInfo')
-        dispatch(resetUserInfo())
         navigate('/')
+        dispatch(resetUserInfo())
       })
       .catch(error => {
         console.error('Logout failed:', error);
@@ -48,7 +47,6 @@ const Navbar = () => {
       });
   };
 
-  useEffect(() => {}, [user])
 
   return (
       <div className='fixed top-0 inset-x-0 h-fit bg-zinc-100 border-b border-zinc-300 z-[10] py-2'>
