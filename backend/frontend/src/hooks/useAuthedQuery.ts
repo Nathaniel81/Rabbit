@@ -1,4 +1,11 @@
-import { useQuery, useQueryClient, QueryFunction, QueryKey, UseQueryOptions, UseQueryResult } from 'react-query';
+import { 
+  useQuery, 
+  useQueryClient, 
+  QueryFunction, 
+  QueryKey, 
+  UseQueryOptions, 
+  UseQueryResult 
+} from 'react-query';
 import axios, { AxiosError } from 'axios';
 import { AppDispatch } from '@/redux/store';
 import { useNavigate } from 'react-router-dom';
@@ -6,6 +13,7 @@ import { resetUserInfo } from '@/redux/slices/authSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { openModal } from '@/redux/slices/modalSlice';
 import { RootState } from '@/redux/rootReducer';
+
 
 // eslint-disable-next-line
 type QueryFn = QueryFunction<any, QueryKey>;

@@ -5,19 +5,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/DropdownMenu';
+import { useToast } from '@/hooks/useToast';
+import { resetUserInfo } from '@/redux/slices/authSlice';
 import { openModal } from '@/redux/slices/modalSlice';
-import { RootState } from '@/redux/store';
+import { AppDispatch, RootState } from '@/redux/store';
+import axios from 'axios';
+import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Icons } from './Icons';
 import { Avatar, AvatarFallback } from './ui/Avatar';
 import { buttonVariants } from './ui/Button';
-import { resetUserInfo } from '@/redux/slices/authSlice';
-import { AppDispatch } from '@/redux/store';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { useToast } from '@/hooks/useToast';
-import { useEffect } from 'react';
 
 
 
