@@ -41,9 +41,13 @@ DEBUG = True
 #   "http://localhost:5173",  
 # ]
 
+ALLOWED_HOSTS = ['rabbit-2ulj.onrender.com']
+
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_ALLOW_ALL = True
+
+
 
 # Application definition
 
