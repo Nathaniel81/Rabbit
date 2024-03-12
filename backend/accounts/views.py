@@ -34,7 +34,6 @@ class GithubOauthSignInView(APIView):
         if serializer.is_valid():
             data = serializer.validated_data
             code_data = data.get('code')
-            print(code_data)
             access_token = code_data.get('access_token')
             refresh_token = code_data.get('refresh_token')
 

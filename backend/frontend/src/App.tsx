@@ -1,8 +1,10 @@
-import { QueryClient, QueryClientProvider } from 'react-query';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { HashRouter as Router, Route, Routes } from 'react-router-dom';
 
 import HomePage from './pages/HomePage';
 import UsersPage from './pages/UsersPage';
+import CreateSubrabbitPage from './pages/CreateSubrabbitPage';
+import SubrabbitDetailPage from './pages/SubrabbitDetailPage';
 
 import AuthenticationModal from './components/AuthenticationModal';
 import Navbar from './components/Navbar';
@@ -18,6 +20,8 @@ function App() {
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/users" element={<UsersPage />} />
+              <Route path="/r/create" element={<CreateSubrabbitPage />} />
+              <Route path="/r/:slug" element={<SubrabbitDetailPage />} />
             </Routes>
         </Router>
         <AuthenticationModal />

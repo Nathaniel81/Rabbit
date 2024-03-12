@@ -19,7 +19,7 @@ db.sqlite3
 .idea/
 
 # Dependency directories
-lib/
+# lib/
 lib64/
 bin/
 include/

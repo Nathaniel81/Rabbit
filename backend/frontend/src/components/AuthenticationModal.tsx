@@ -19,7 +19,7 @@ const AuthenticationModal: FC = () => {
     const { isOpen, modalType } = modalState;
     const dispatch = useDispatch();
 
-    const showModal = () => {
+    const hideModal = () => {
         dispatch(closeModal());
     }
     const openSignUp = (type: string) => {
@@ -38,7 +38,7 @@ const AuthenticationModal: FC = () => {
             <div className='container flex items-center h-full max-w-lg mx-auto'>
                 <div className='relative bg-white w-full h-fit py-20 px-2 rounded-lg'>
                     <div className='absolute top-4 right-4'>
-                        <Button variant='subtle' className='h-6 w-6 p-0 rounded-md' onClick={showModal}>
+                        <Button variant='subtle' className='h-6 w-6 p-0 rounded-md' onClick={hideModal}>
                             <X aria-label='close modal' className='h-4 w-4' />
                         </Button>
                     </div>

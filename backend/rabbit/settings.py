@@ -35,7 +35,6 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-# ALLOWED_HOSTS = ["*"]
 
 # CORS_ALLOWED_ORIGINS = [
 #   "http://localhost:5173",  
@@ -46,6 +45,17 @@ ALLOWED_HOSTS = ['rabbit-2ulj.onrender.com']
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_ALLOW_ALL = True
+CSRF_TRUSTED_ORIGINS = [
+    'rabbit-2ulj.onrender.com'
+    'http://localhost:5173',
+]
+# CORS_EXPOSE_HEADERS = ["Content-Type", "X-CSRFToken"]
+# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_HTTP_ONLY = True
+CSRF_COOKIE_SAMESITE = "None"
+
+
 
 
 
@@ -115,8 +125,8 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-  'ACCESS_TOKEN_LIFETIME': timedelta(seconds=20),
-  'REFRESH_TOKEN_LIFETIME': timedelta(seconds=20),
+  'ACCESS_TOKEN_LIFETIME': timedelta(minutes=200),
+  'REFRESH_TOKEN_LIFETIME': timedelta(minutes=230),
   'ROTATE_REFRESH_TOKENS': False,
   'BLACKLIST_AFTER_ROTATION': True,
   'UPDATE_LAST_LOGIN': False,

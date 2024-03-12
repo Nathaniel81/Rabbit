@@ -1,11 +1,13 @@
 from django.db import models
 from accounts.models import User
 from django_editorjs_fields import EditorJsJSONField
+from django.core.validators import MinLengthValidator, MaxLengthValidator
 
 
 class Subrabbit(models.Model):
     creator = models.ForeignKey(User, on_delete=models.CASCADE)
-    name = models.CharField(max_length=100, unique=True)
+    name = models.CharField(max_length=21, unique=True, validators=[
+        MinLengthValidator(3), MaxLengthValidator(21)])
     description = models.CharField(max_length=500, blank=True)
     subscribers = models.ManyToManyField(User, related_name='subscriptions', blank=True)
     moderators = models.ManyToManyField(User, related_name='moderates', blank=True)
