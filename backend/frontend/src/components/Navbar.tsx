@@ -56,7 +56,9 @@ const Navbar = () => {
             <p className='hidden text-zinc-700 text-sm font-medium md:block'>Rabbit</p>
           </Link>
         <div className="flex justify-between gap-5">
+
           {/* <SearchBar /> */}
+          
           {user ? (
             <>
               <DropdownMenu>

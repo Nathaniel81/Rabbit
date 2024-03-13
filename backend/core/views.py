@@ -8,7 +8,7 @@ from .models import Subrabbit
 from .permissions import IsAuthenticatedOrReadOnly
 from .serializers import SubrabbitSerializer, SubrabbitSerializer_detailed
 
-# from rest_framework.response import Response
+from rest_framework.response import Response
 # from rest_framework import serializers
 
 
@@ -18,10 +18,21 @@ class SubrabbitListCreateView(generics.ListCreateAPIView):
     queryset = Subrabbit.objects.all().order_by('-created_at')
 
     # Apply authentication to unsafe HTTP methods
-    def get_authenticators(self):
-        if self.request.method in SAFE_METHODS:
-            return []
-        return super().get_authenticators()
+    # def get_authenticators(self):
+    #     if self.request.method in SAFE_METHODS:
+    #         return []
+    #     return super().get_authenticators()
+
+    def initial(self, request, *args, **kwargs):
+        super().initial(request, *args, **kwargs)
+        if self.request.method == 'GET': #and request.user.is_authenticated:
+            user = request.user
+            print(user)
+        #     instance = self.get_object()
+        #     is_subscriber = instance.subscribers.filter(id=user.id).exists()
+        #     self.is_subscriber = is_subscriber
+        # else:
+        #     self.is_subscriber = False
 
     # Dynamically select serializer based on HTTP method
     def get_serializer_class(self):
@@ -67,3 +78,48 @@ class SubrabbitListCreateView(generics.ListCreateAPIView):
             return Response(e.detail, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
         else:
             return Response(e.detail, status=status.HTTP_400_BAD_REQUEST)
+
+class SubrabbitDetail(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    authentication_classes = [CustomAuthentication]
+    queryset = Subrabbit.objects.all()
+    lookup_field = 'name'
+
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return SubrabbitSerializer_detailed
+        return SubrabbitSerializer
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        data = serializer.data
+        if request.user.is_authenticated:
+            user = request.user
+            instance = self.get_object()
+            is_subscriber = instance.subscribers.filter(id=user.id).exists()
+            data['isSubscriber'] = is_subscriber
+        return Response(data)
+
+class SubscribeView(generics.UpdateAPIView):
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    authentication_classes = [CustomAuthentication]
+    queryset = Subrabbit.objects.all()
+    lookup_field = 'name'
+
+    def update(self, request, *args, **kwargs):
+        subrabbit = self.get_object()
+        subrabbit.subscribers.add(request.user)
+        return Response({'message': 'subscribed successfully'}, status=status.HTTP_204_NO_CONTENT)
+
+
+class UnsubscribeView(generics.UpdateAPIView):
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    authentication_classes = [CustomAuthentication]
+    queryset = Subrabbit.objects.all()
+    lookup_field = 'name'
+
+    def update(self, request, *args, **kwargs):
+        subrabbit = self.get_object()
+        subrabbit.subscribers.remove(request.user)
+        return Response({'message': 'unsubscribed successfully'} ,status=status.HTTP_204_NO_CONTENT)

@@ -26,7 +26,11 @@ class CustomAuthentication(jwt_authentication.JWTAuthentication):
 
         if raw_token is None:
             return None
-        validated_token = self.get_validated_token(raw_token)
+        
+        try:
+            validated_token = self.get_validated_token(raw_token)
+        except Exception as e:
+            return None
         enforce_csrf(request)
 
         return self.get_user(validated_token), validated_token

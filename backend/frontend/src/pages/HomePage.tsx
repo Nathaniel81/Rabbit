@@ -6,6 +6,8 @@ import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { RootState } from '@/redux/store';
 import { buttonVariants } from '@/components/ui/Button';
 import { Home as HomeIcon } from 'lucide-react'
+import axios from 'axios'
+import { useQuery } from '@tanstack/react-query';
 
 
 const HomePage = () => {
@@ -35,6 +37,14 @@ const HomePage = () => {
     }
   }, []);
 
+  const { isLoading, error, data } = useQuery({
+    queryKey: ['subrabbits'],
+    queryFn: async () => {
+      const response = await axios.get('/api/subrabbits/');
+      return response.data;
+    },
+  });
+
   if (loading) <div className='mt-16'>Loading..</div>
 
   return (
@@ -42,7 +52,13 @@ const HomePage = () => {
       <h1 className='font-bold text-3xl md:text-4xl'>Your feed</h1>
       <div className='grid grid-cols-1 md:grid-cols-3 gap-y-4 md:gap-x-4 py-6'>
         {/* <Feed /> */}
-        <div>1</div>
+        <div className='box'>
+          {data?.map((rabbit: string) => (
+            <div key={rabbit.id}>
+              <Link to={`r/${rabbit.name}`}>{rabbit.name}</Link>
+            </div>
+          ))}
+        </div>
         
         {/* subreddit info */}
         <div className='overflow-hidden h-fit rounded-lg border border-gray-200 order-first md:order-last'>

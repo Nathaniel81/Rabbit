@@ -11,6 +11,7 @@ import { openModal } from '@/redux/slices/modalSlice';
 import { useNavigate } from 'react-router-dom'
 import { useDispatch} from 'react-redux'
 import { SubrabbitValidator } from '@/lib/validators/subrabbit'
+import { getCsrfToken } from '@/lib/utils'
 
 
 const CreateSubrabbitPage = () => {
@@ -28,27 +29,20 @@ const CreateSubrabbitPage = () => {
       const result = SubrabbitValidator.safeParse(payload);
 
       if (!result.success) {
-        // console.error(result.error);
         throw new Error(result.error.errors[0].message);
       }
-
-      // console.log("Validation result:", result);
-
-      const csrfToken = document.cookie
-      .split('; ')
-      .find(row => row.startsWith('csrftoken='))?.split('=')[1];
-
 
       const { data } = await axios.post('/api/subrabbits/', payload, {
         withCredentials: true,
         headers: {
           "Content-Type": "application/json",
-          "x-csrftoken": csrfToken
+          "x-csrftoken": getCsrfToken()
         },
       })
       return data as string
     },
-    onError: (err) => {
+    /* eslint-disable-next-line */
+    onError: (err: any) => {
       if (err instanceof AxiosError) {
         if (err.response?.status === 409) {
           return toast({

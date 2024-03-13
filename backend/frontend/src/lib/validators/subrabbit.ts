@@ -8,7 +8,7 @@ export const SubrabbitValidator = z.object({
 
 
 export const SubrabbitSubscriptionValidator = z.object({
-  subredditId: z.string(),
+  subrabbitId: z.number(),
 })
 
 export type CreateSubrabbitPayload = z.infer<typeof SubrabbitValidator>

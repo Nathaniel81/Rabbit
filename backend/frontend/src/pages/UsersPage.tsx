@@ -1,5 +1,5 @@
-import axios from 'axios';
-import useAuthedQuery from '../hooks/useAuthedQuery';
+// import axios from 'axios';
+// import useAuthedQuery from '../hooks/useAuthedQuery';
 
 
 // interface User {
@@ -10,20 +10,20 @@ import useAuthedQuery from '../hooks/useAuthedQuery';
 
 const UsersPage = () => {
 
-  const { isLoading } = useAuthedQuery('users', async () => {
-    const response = await axios.get('/api/user/', {
-      withCredentials: true,
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    console.log('Response data:', response.data);
-    return response.data;
-  });
+  // const { isLoading } = useAuthedQuery('users', async () => {
+  //   const response = await axios.get('/api/user/', {
+  //     withCredentials: true,
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //   });
+  //   console.log('Response data:', response.data);
+  //   return response.data;
+  // });
 
 
     
-  if (isLoading) return <div>Loading...</div>;
+  // if (isLoading) return <div>Loading...</div>;
 
   return (
     <div className='mt-10 box'>
