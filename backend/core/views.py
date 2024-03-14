@@ -4,6 +4,7 @@ from accounts.authenticate import CustomAuthentication
 from bs4 import BeautifulSoup
 from cloudinary.uploader import upload
 from django.core.files.storage import FileSystemStorage
+from django.db.models import Count, F, Q
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, status
 from rest_framework.decorators import api_view
@@ -14,7 +15,8 @@ from rest_framework.views import APIView
 
 from .models import Comment, CommentVote, Post, Subrabbit, Vote, VoteType
 from .permissions import IsAuthenticatedOrReadOnly
-from .serializers import SubrabbitSerializer, SubrabbitSerializer_detailed
+from .serializers import (PostSerializer, SubrabbitSerializer,
+                          SubrabbitSerializer_detailed)
 
 
 class SubrabbitListCreateView(generics.ListCreateAPIView):
@@ -153,9 +155,6 @@ class VoteView(APIView):
                 vote.save()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-from django.db.models import Count, Q, F
-from .serializers import PostSerializer
 
 class PostListView(generics.ListAPIView):
     serializer_class = PostSerializer

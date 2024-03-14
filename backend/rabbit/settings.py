@@ -46,8 +46,8 @@ CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_ALLOW_ALL = True
 CSRF_TRUSTED_ORIGINS = [
-    # 'rabbit-2ulj.onrender.com'
-    'http://localhost:5173',
+    'http://rabbit-2ulj.onrender.com'
+    # 'http://localhost:5173',
 ]
 # CORS_EXPOSE_HEADERS = ["Content-Type", "X-CSRFToken"]
 # SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
@@ -173,18 +173,18 @@ AUTH_USER_MODEL = 'accounts.User'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
-
-# database_url = os.getenv('DATABASE_URL')
-
 # DATABASES = {
-#     'default': dj_database_url.parse(database_url)
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
 # }
+
+database_url = os.getenv('DATABASE_URL')
+
+DATABASES = {
+    'default': dj_database_url.parse(database_url)
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
