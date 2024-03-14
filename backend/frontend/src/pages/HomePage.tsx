@@ -1,9 +1,9 @@
 import { loginWithGithub } from '@/redux/slices/authSlice';
 import { AppDispatch } from '@/redux/store';
 import { useEffect } from 'react';
-import { useSelector, useDispatch} from 'react-redux'
+import { useDispatch} from 'react-redux'
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
-import { RootState } from '@/redux/store';
+// import { RootState } from '@/redux/store';
 import { buttonVariants } from '@/components/ui/Button';
 import { Home as HomeIcon } from 'lucide-react'
 import axios from 'axios'
@@ -16,9 +16,12 @@ const HomePage = () => {
   const code = searchparams.get('code');
   const navigate = useNavigate();
 
-  const userLogin = useSelector((state: RootState) => state.userInfo);
-  const { loading } = userLogin;
-
+  // const userLogin = useSelector((state: RootState) => state.userInfo);
+  // const {} = userLogin;
+type Rabbit = {
+  name: string;
+  id: string;
+}
   
   useEffect(() => {
     if (code) {
@@ -37,7 +40,7 @@ const HomePage = () => {
     }
   }, []);
 
-  const { isLoading, error, data } = useQuery({
+  const { data } = useQuery({
     queryKey: ['subrabbits'],
     queryFn: async () => {
       const response = await axios.get('/api/subrabbits/');
@@ -45,7 +48,7 @@ const HomePage = () => {
     },
   });
 
-  if (loading) <div className='mt-16'>Loading..</div>
+  // if (loading) <div className='mt-16'>Loading..</div>
 
   return (
     <>
@@ -53,7 +56,7 @@ const HomePage = () => {
       <div className='grid grid-cols-1 md:grid-cols-3 gap-y-4 md:gap-x-4 py-6'>
         {/* <Feed /> */}
         <div className='box'>
-          {data?.map((rabbit: string) => (
+          {data?.map((rabbit: Rabbit) => (
             <div key={rabbit.id}>
               <Link to={`r/${rabbit.name}`}>{rabbit.name}</Link>
             </div>

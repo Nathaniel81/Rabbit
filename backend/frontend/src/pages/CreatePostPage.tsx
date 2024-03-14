@@ -1,18 +1,11 @@
 import { Button } from "@/components/ui/Button";
 import { useParams } from 'react-router-dom';
-// import Editor from "@/components/Editor";
-// import { useSelector } from 'react-redux'
-// import { RootState } from '@/redux/store'
 import SubrabbitSidebar from "@/components/SubrabbitSidebar";
-import { useQueryClient } from '@tanstack/react-query';
 import Editor from "@/components/Editor";
 
 
 const CreatePostPage = () => {
   const { slug } = useParams();
-  const queryClient = useQueryClient();
-  const queryKey = ['subrabbitDetail'];
-  const data = queryClient.getQueryData(queryKey);
 
   return (
     <div className='sm:container max-w-7xl mx-auto h-full pt-12'>
@@ -30,7 +23,7 @@ const CreatePostPage = () => {
           </div>
         </div>
 
-        <Editor subrabbitId={data?.id} />
+        <Editor />
   
         <div className='w-full flex justify-end'>
           <Button type='submit' className='w-full' form='subrabbit-post-form'>
@@ -40,7 +33,7 @@ const CreatePostPage = () => {
       </div>
       
       <div className='overflow-hidden h-fit rounded-lg border border-gray-200 order-first md:order-last'>
-        <SubrabbitSidebar subrabbit={data} querKey={queryKey}/>
+        <SubrabbitSidebar />
       </div>
 
       </div>

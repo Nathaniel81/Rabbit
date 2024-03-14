@@ -63,8 +63,6 @@ const PostVote = ({
       )
     },
     onSuccess: () => {
-        // dispatch(fetchPostDetails(postId))
-        // dispatch(fetchPosts())
         queryClient.invalidateQueries({ queryKey: queryKey, exact: true });
 
     },

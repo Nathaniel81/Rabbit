@@ -12,7 +12,6 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import PostFeed from '@/components/PostFeed';
 
 
-
 const SubrabbitDetailPage = () => {
 
   const location = useLocation();
@@ -96,7 +95,7 @@ const SubrabbitDetailPage = () => {
               </div>
             </li>
 
-            <PostFeed posts={subrabbitPosts} subrabbitName={slug} />
+            <PostFeed posts={subrabbitPosts} />
 
           </ul>
 
@@ -105,7 +104,7 @@ const SubrabbitDetailPage = () => {
               <p className='font-semibold py-3'>About r/{slug}</p>
             </div>
 
-            <SubrabbitSidebar queryKey={queryKey} subrabbit={subrabbit} />
+            <SubrabbitSidebar />
 
           </div>
         </div>

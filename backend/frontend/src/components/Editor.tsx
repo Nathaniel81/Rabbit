@@ -10,26 +10,23 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import TextareaAutosize from 'react-textarea-autosize';
 import { z } from 'zod';
 import { getCsrfToken } from '@/lib/utils';
-import { useSelector } from 'react-redux'
+import { useQueryClient } from '@tanstack/react-query';
+import { Subrabbit } from '@/types/subrabbit';
 // import '@/styles/editor.css'
+
+
 
 type FormData = z.infer<typeof PostValidator>
 
-interface EditorProps {
-  subrabbitId: number;
-}
 
-
-
-
-const Editor: React.FC<EditorProps> = ({ subrabbitId }) => {
-    const subredditDetail = useSelector((state) => state.userInfo);
-    const { user } = subredditDetail;
+const Editor = () => {
+    const queryClient = useQueryClient();
+    const queryKey = ['subrabbitDetail'];
+    const data = queryClient.getQueryData(queryKey) as Subrabbit;
+    const subrabbitId = data?.id;
 
     const navigate = useNavigate();
     const location = useLocation();
-    // const newPost = useSelector((state: RootState) => state.postCreate);
-    // const { success, loading, error } = newPost;
 
     const {
         register,
@@ -49,7 +46,6 @@ const Editor: React.FC<EditorProps> = ({ subrabbitId }) => {
       const _titleRef = useRef<HTMLTextAreaElement>(null)
 
       const [isMounted, setIsMounted] = useState<boolean>(false)
-      // const dispatch = useDispatch<AppDispatch>()
 
       const { mutate: createPost } = useMutation({
         mutationFn: async ({
@@ -58,12 +54,6 @@ const Editor: React.FC<EditorProps> = ({ subrabbitId }) => {
           subrabbitId,
         }: PostCreationRequest) => {
           const payload: PostCreationRequest = { title, content, subrabbitId }
-          // const config = {
-          //   headers: {
-          //       'Content-type': 'application/json',
-          //       Authorization: `Bearer ${user?.access_token}`
-          //   }
-          // }
 
           const { data } = await axios.post(
             '/api/create-post/', 
@@ -91,9 +81,6 @@ const Editor: React.FC<EditorProps> = ({ subrabbitId }) => {
           const newPathname = location.pathname.split('/').slice(0, -1).join('/');
           navigate(newPathname);
 
-          // router.push(newPathname)
-          // router.refresh()
-    
           return toast({
             description: 'Your post has been published.',
           })

@@ -7,13 +7,14 @@ import { useRef } from "react"
 import EditorOutput from './EditorOutput'
 import { Post } from '@/types/post'
 import PostVote from './PostVote'
+import { useParams } from 'react-router-dom'
 
 
-
-const PostFeed = ({ posts, subrabbitName }: { posts: Post[], subrabbitName: string }) => {
+const PostFeed = ({ posts }: { posts: Post[] }) => {
   const pRef = useRef<HTMLParagraphElement>(null)
   const userLogin = useSelector((state: RootState) => state.userInfo);
   const { user } = userLogin;
+  const { slug: subrabbitName } = useParams();
 
       return (
         <ul className='flex flex-col col-span-2 space-y-6'>

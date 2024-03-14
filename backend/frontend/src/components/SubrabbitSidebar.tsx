@@ -8,30 +8,29 @@ import { format } from 'date-fns';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { handleAxiosError, getCsrfToken } from '@/lib/utils';
-import { Subrabbit } from '@/types/subrabbit';
+import { SubrabbitData } from '@/types/subrabbit';
 
 
 
-type SubscribeComponentProps = {
-  queryKey: string[];
-  subrabbit: Subrabbit;
-};
-
-const SubrabbitSidebar = ({ subrabbit, queryKey }: SubscribeComponentProps) => {
+const SubrabbitSidebar = () => {
   const userLogin = useSelector((state: RootState) => state.userInfo);
   const { user } = userLogin;
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
   const { toast } = useToast()
-  const queryClient = useQueryClient();
   const location = useLocation();
   const path = location.pathname;
-
+  const queryClient = useQueryClient();
+  const queryKey = ['subrabbitDetail'];
+  const subrabbit = queryClient.getQueryData<SubrabbitData>(queryKey);
   
   const { mutate: subscribe, isPending: isSubLoading } = useMutation({
     mutationFn: async () => {
+      if (!subrabbit) {
+        throw new Error("Subrabbit is undefined");
+      }
       const payload: SubscribeToSubrabbitPayload = {
-        subrabbitId: subrabbit.id
+        subrabbitId: subrabbit?.id || 0
       }
       const result = SubrabbitSubscriptionValidator.safeParse(payload);
       if (!result.success) {
@@ -71,8 +70,11 @@ const SubrabbitSidebar = ({ subrabbit, queryKey }: SubscribeComponentProps) => {
 
   const { mutate: unsubscribe, isPending: isUnsubLoading } = useMutation({
     mutationFn: async () => {
+      if (!subrabbit) {
+        throw new Error("Subrabbit is undefined");
+      }
       const payload: SubscribeToSubrabbitPayload = {
-        subrabbitId: subrabbit.id
+        subrabbitId: subrabbit?.id || 0
       }
       const result = SubrabbitSubscriptionValidator.safeParse(payload);
       if (!result.success) {
