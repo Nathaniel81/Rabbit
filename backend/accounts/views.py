@@ -1,5 +1,5 @@
 import requests
-from accounts.authenticate import CustomAuthentication
+# from accounts.authenticate import CustomAuthentication
 from django.conf import settings
 from django.contrib.auth import authenticate
 from django.core.exceptions import ValidationError
@@ -20,7 +20,7 @@ from .serializers import GithubLoginSerializer, UserSerializer
 
 class GetAllUsers(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
-    authentication_classes = [CustomAuthentication]
+    # authentication_classes = [CustomAuthentication]
 
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -42,7 +42,10 @@ class GithubOauthSignInView(APIView):
                     'user_id': code_data.get('id'),
                     'username': code_data.get('username'),
                     'email': code_data.get('email'),
-                    'profile_picture': code_data.get('profile_picture')
+                    'profile_picture': code_data.get('profile_picture'),
+                    # 'access_token': access_token,
+                    # 'refresh_token': refresh_token
+
                 }, status=status.HTTP_200_OK)
 
                 response.set_cookie(

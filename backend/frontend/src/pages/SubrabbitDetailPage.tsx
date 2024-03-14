@@ -9,6 +9,8 @@ import axios from 'axios';
 import { Image as ImageIcon, Link2 } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import PostFeed from '@/components/PostFeed';
+
 
 
 const SubrabbitDetailPage = () => {
@@ -31,6 +33,17 @@ const SubrabbitDetailPage = () => {
     },
   });
 
+  const postsQueryKey = ['posts'];
+  const { data: subrabbitPosts } = useQuery({
+    queryKey: postsQueryKey,
+    queryFn: async () => {
+      const response = await axios.get(`/api/subrabbit/${slug}/posts/`);
+      const res = await response.data
+      return res;
+    },
+  });
+
+  console.log(subrabbit)
 
   return (
     <div className='sm:container max-w-7xl mx-auto h-full pt-12'>
@@ -39,7 +52,6 @@ const SubrabbitDetailPage = () => {
 
         <div className='grid grid-cols-1 md:grid-cols-3 gap-y-4 md:gap-x-4 py-6'>
           <ul className='flex flex-col col-span-2 space-y-6'>
-            {/* <subrabbitDetail /> */}
             <h1 className='font-bold text-3xl md:text-4xl h-14'>
               r/{slug}
             </h1>
@@ -84,7 +96,7 @@ const SubrabbitDetailPage = () => {
               </div>
             </li>
 
-            {/* <PostFeed posts={subrabbit.posts} subrabbitName={subrabbit.name} /> */}
+            <PostFeed posts={subrabbitPosts} subrabbitName={slug} />
 
           </ul>
 

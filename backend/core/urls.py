@@ -7,4 +7,13 @@ urlpatterns = [
     path('subrabbit/<str:name>/', views.SubrabbitDetail.as_view(), name='subrabbit-detail'),
     path('subrabbit/<str:name>/subscribe/', views.SubscribeView.as_view(), name='subscribe'),
     path('subrabbit/<str:name>/unsubscribe/', views.UnsubscribeView.as_view(), name='unsubcribe'),
+
+    path('link/', views.fetch_url_metadata),
+    path('upload-image/', views.upload_image),
+    path('upload-file/', views.upload_file),
+
+    path('create-post/', views.CreatePostView.as_view()),
+    path('subrabbit/post/vote/', views.VoteView.as_view()),
+    path('posts/', views.PostListView.as_view()),
+    path('subrabbit/<str:subrabbit_name>/posts/', views.SubrabbitPostsList.as_view()),
 ]

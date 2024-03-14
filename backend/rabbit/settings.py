@@ -40,7 +40,7 @@ DEBUG = True
 #   "http://localhost:5173",  
 # ]
 
-# ALLOWED_HOSTS = ['rabbit-2ulj.onrender.com']
+# ALLOWED_HOSTS = ['*']
 
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
@@ -125,8 +125,8 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-  'ACCESS_TOKEN_LIFETIME': timedelta(seconds=20),
-  'REFRESH_TOKEN_LIFETIME': timedelta(minutes=2),
+  'ACCESS_TOKEN_LIFETIME': timedelta(minutes=70),
+  'REFRESH_TOKEN_LIFETIME': timedelta(minutes=90),
   'ROTATE_REFRESH_TOKENS': False,
   'BLACKLIST_AFTER_ROTATION': True,
   'UPDATE_LAST_LOGIN': False,
@@ -227,8 +227,8 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'frontend', 'dist')
 ]
 
-# MEDIA_URL = '/media/'
-# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"

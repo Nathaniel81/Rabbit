@@ -13,6 +13,7 @@ def enforce_csrf(request):
     csrf_token = request.META.get('HTTP_X_CSRFTOKEN', '')
     request.META['CSRF_COOKIE'] = csrf_token
     reason = csrf_middleware.process_view(request, None, (), {})
+
     if reason:
         raise rest_exceptions.PermissionDenied('CSRF Failed: %s' % reason)
 
@@ -27,10 +28,13 @@ class CustomAuthentication(jwt_authentication.JWTAuthentication):
         if raw_token is None:
             return None
         
+        print('Not None')
         try:
             validated_token = self.get_validated_token(raw_token)
         except Exception as e:
+            print(e)
             return None
-        enforce_csrf(request)
+
+        # enforce_csrf(request)
 
         return self.get_user(validated_token), validated_token

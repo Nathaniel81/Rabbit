@@ -31,14 +31,14 @@ const CreateSubrabbitPage = () => {
       if (!result.success) {
         throw new Error(result.error.errors[0].message);
       }
-
-      const { data } = await axios.post('/api/subrabbits/', payload, {
+      const config = {
         withCredentials: true,
         headers: {
           "Content-Type": "application/json",
           "x-csrftoken": getCsrfToken()
         },
-      })
+      }
+      const { data } = await axios.post('/api/subrabbits/', payload, config )
       return data as string
     },
     /* eslint-disable-next-line */

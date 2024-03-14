@@ -27,7 +27,6 @@ const SubrabbitSidebar = ({ subrabbit, queryKey }: SubscribeComponentProps) => {
   const location = useLocation();
   const path = location.pathname;
 
-
   
   const { mutate: subscribe, isPending: isSubLoading } = useMutation({
     mutationFn: async () => {
