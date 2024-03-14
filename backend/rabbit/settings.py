@@ -40,7 +40,7 @@ DEBUG = True
 #   "http://localhost:5173",  
 # ]
 
-# ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['*']
 
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
