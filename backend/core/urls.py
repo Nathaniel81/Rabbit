@@ -20,5 +20,5 @@ urlpatterns = [
     path('subrabbit/<str:subrabbit_name>/posts/', views.SubrabbitPostsList.as_view(), name='subrabbit-posts'),
     path('subrabbit/post/comment/', views.CreateComment.as_view(), name='create-comment'),
     path('subrabbit/post/comment/vote/', views.CommentVoteView.as_view(), name='create-vote'),
-    path('search/', views.SearchView.as_view()),
+    path('search/', views.SearchView.as_view(), name='search'),
 ]
