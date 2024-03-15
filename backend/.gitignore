@@ -11,6 +11,8 @@ db.sqlite3
 /venv
 .env/
 
+/Stp.txt
+
 # Local development settings
 *.env
 

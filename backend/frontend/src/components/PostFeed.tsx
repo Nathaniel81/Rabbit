@@ -7,14 +7,15 @@ import { useRef } from "react"
 import EditorOutput from './EditorOutput'
 import { Post } from '@/types/post'
 import PostVote from './PostVote'
-import { useParams } from 'react-router-dom'
+// import { useParams } from 'react-router-dom'
 
 
 const PostFeed = ({ posts }: { posts: Post[] }) => {
   const pRef = useRef<HTMLParagraphElement>(null)
   const userLogin = useSelector((state: RootState) => state.userInfo);
   const { user } = userLogin;
-  const { slug: subrabbitName } = useParams();
+  // const { slug: subrabbitName } = useParams();
+  
 
       return (
         <ul className='flex flex-col col-span-2 space-y-6'>
@@ -29,7 +30,6 @@ const PostFeed = ({ posts }: { posts: Post[] }) => {
             const currentVote = post.votes.find(
               (vote) => vote.user === user?.user_id
             )
-
             return (
               <li key={index}>
                 <div className='rounded-md bg-white shadow'>
@@ -41,12 +41,12 @@ const PostFeed = ({ posts }: { posts: Post[] }) => {
                         />
                         <div className='w-0 flex-1'>
                           <div className='max-h-40 mt-1 text-xs text-gray-500'>
-                            {subrabbitName ? (
+                            {post?.subrabbit.name ? (
                               <>
                                 <Link
                                   className='underline text-zinc-900 text-sm underline-offset-2'
-                                  to={`/r/${subrabbitName}`}>
-                                  r/{subrabbitName}
+                                  to={`/r/${post?.subrabbit.name}`}>
+                                  r/{post?.subrabbit.name}
                                 </Link>
                                 <span className='px-1'>•</span>
                               </>
@@ -54,7 +54,7 @@ const PostFeed = ({ posts }: { posts: Post[] }) => {
                             <span>Posted by u/{post.author.username}</span>{' '}
                             {formatTimeToNow(new Date(post.created_at))}
                           </div>
-                            <Link to={`/r/${subrabbitName}/post/${post.id}`}>
+                            <Link to={`/r/${post?.subrabbit.name}/post/${post.id}`}>
                               <h1 className='text-lg font-semibold py-2 leading-6 text-gray-900'>
                                 {post.title || post.id}
                               </h1>
@@ -70,7 +70,7 @@ const PostFeed = ({ posts }: { posts: Post[] }) => {
                     </div>
                     <div className='bg-gray-50 z-20 text-sm px-4 py-4 sm:px-6'>
                       <Link
-                        to={`/r/${subrabbitName}/post/${post.id}`}
+                        to={`/r/${post?.subrabbit.name}/post/${post.id}`}
                         className='w-fit flex items-center gap-2'>
                         <MessageSquare className='h-4 w-4' /> 
                         {post?.comments.length} comment{post?.comments.length > 1 && 's'}

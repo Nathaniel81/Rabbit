@@ -1,3 +1,5 @@
+import { SubrabbitData } from "./subrabbit";
+
 type Votes = {
 	type: VoteType;
 	user: string;
@@ -8,6 +10,7 @@ type Votes = {
   type Author = {
 	username: string;
   }
+
   
   export type Post = {
 	id: string;
@@ -15,7 +18,7 @@ type Votes = {
 	author: Author;
 	comments: string;
 	content: string;
-	subrabbit: string;
+	subrabbit: SubrabbitData;
 	votes: Votes[];
 	created_at: string;
 	members_count: string;

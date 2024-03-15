@@ -10,6 +10,7 @@ import { Image as ImageIcon, Link2 } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import PostFeed from '@/components/PostFeed';
+import { getCsrfToken } from '@/lib/utils';
 
 
 const SubrabbitDetailPage = () => {
@@ -26,7 +27,14 @@ const SubrabbitDetailPage = () => {
   const { data: subrabbit } = useQuery({
     queryKey: queryKey,
     queryFn: async () => {
-      const response = await axios.get(`/api/subrabbit/${slug}/`);
+      const config = {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+          "x-csrftoken": getCsrfToken()
+        },
+      }
+      const response = await axios.get(`/api/subrabbit/${slug}/`, config);
       const res = await response.data
       return res;
     },
@@ -36,7 +44,14 @@ const SubrabbitDetailPage = () => {
   const { data: subrabbitPosts } = useQuery({
     queryKey: postsQueryKey,
     queryFn: async () => {
-      const response = await axios.get(`/api/subrabbit/${slug}/posts/`);
+      const config = {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+          "x-csrftoken": getCsrfToken()
+        },
+      }
+      const response = await axios.get(`/api/subrabbit/${slug}/posts/`, config);
       const res = await response.data
       return res;
     },

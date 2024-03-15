@@ -167,10 +167,13 @@ class PostListView(generics.ListAPIView):
             downvotes=Count('votes', filter=Q(votes__type=VoteType.DOWN))
         ).annotate(net_votes=F('upvotes') - F('downvotes'))
 
+        queryset = queryset.annotate(num_comments=Count('comments'))
         if user.is_authenticated:
             queryset = queryset.filter(subrabbit__subscribers=user)
         
-        return queryset.order_by('-net_votes', '-created_at')
+        queryset = queryset.order_by('-net_votes', '-num_comments', '-created_at')
+        
+        return queryset
 
 class SubrabbitPostsList(generics.ListAPIView):
     serializer_class = PostSerializer

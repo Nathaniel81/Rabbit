@@ -6,9 +6,14 @@ import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 // import { RootState } from '@/redux/store';
 import { buttonVariants } from '@/components/ui/Button';
 import { Home as HomeIcon } from 'lucide-react'
-import axios from 'axios'
-import { useQuery } from '@tanstack/react-query';
+// import axios from 'axios'
+// import { useQuery } from '@tanstack/react-query';
+import Feed from '@/components/homepage/Feed';
 
+// type Rabbit = {
+//   name: string;
+//   id: string;
+// }
 
 const HomePage = () => {
   const [searchparams] = useSearchParams();
@@ -18,10 +23,6 @@ const HomePage = () => {
 
   // const userLogin = useSelector((state: RootState) => state.userInfo);
   // const {} = userLogin;
-type Rabbit = {
-  name: string;
-  id: string;
-}
   
   useEffect(() => {
     if (code) {
@@ -40,30 +41,30 @@ type Rabbit = {
     }
   }, []);
 
-  const { data } = useQuery({
-    queryKey: ['subrabbits'],
-    queryFn: async () => {
-      const response = await axios.get('/api/subrabbits/');
-      return response.data;
-    },
-  });
+  // const { data } = useQuery({
+  //   queryKey: ['subrabbits'],
+  //   queryFn: async () => {
+  //     const response = await axios.get('/api/subrabbits/');
+  //     return response.data;
+  //   },
+  // });
 
-  // if (loading) <div className='mt-16'>Loading..</div>
 
   return (
-    <>
-      <h1 className='font-bold text-3xl md:text-4xl'>Your feed</h1>
+    <div className='sm:container max-w-7xl mx-auto h-full pt-12'>
+      <h1 className='font-bold text-3xl md:text-4xl mt-4'>Your feed</h1>
       <div className='grid grid-cols-1 md:grid-cols-3 gap-y-4 md:gap-x-4 py-6'>
-        {/* <Feed /> */}
-        <div className='box'>
+        <Feed />
+
+        {/* <div className='box'>
           {data?.map((rabbit: Rabbit) => (
             <div key={rabbit.id}>
               <Link to={`r/${rabbit.name}`}>{rabbit.name}</Link>
             </div>
           ))}
-        </div>
+        </div> */}
         
-        {/* subreddit info */}
+        {/* subrabbit info */}
         <div className='overflow-hidden h-fit rounded-lg border border-gray-200 order-first md:order-last'>
           <div className='bg-emerald-100 px-6 py-4'>
             <p className='font-semibold py-3 flex items-center gap-1.5'>
@@ -89,7 +90,7 @@ type Rabbit = {
           </dl>
         </div>
       </div>
-    </>
+    </div>
   )
 }
 
