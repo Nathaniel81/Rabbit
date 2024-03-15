@@ -8,7 +8,7 @@ from django.db.models import Count, F, Q
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, status
 from rest_framework.decorators import api_view
-from rest_framework.permissions import SAFE_METHODS
+from rest_framework.permissions import SAFE_METHODS, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 from rest_framework.views import APIView
@@ -16,7 +16,7 @@ from rest_framework.views import APIView
 from .models import Comment, CommentVote, Post, Subrabbit, Vote, VoteType
 from .permissions import IsAuthenticatedOrReadOnly
 from .serializers import (PostSerializer, SubrabbitSerializer,
-                          SubrabbitSerializer_detailed)
+                          SubrabbitSerializer_detailed, CommentSerializer)
 
 
 class SubrabbitListCreateView(generics.ListCreateAPIView):
@@ -92,7 +92,7 @@ class SubrabbitDetail(generics.RetrieveUpdateDestroyAPIView):
         return Response(data)
 
 class SubscribeView(generics.UpdateAPIView):
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticated]
     authentication_classes = [CustomAuthentication]
     queryset = Subrabbit.objects.all()
     lookup_field = 'name'
@@ -103,7 +103,7 @@ class SubscribeView(generics.UpdateAPIView):
         return Response({'message': 'subscribed successfully'}, status=status.HTTP_204_NO_CONTENT)
 
 class UnsubscribeView(generics.UpdateAPIView):
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticated]
     authentication_classes = [CustomAuthentication]
     queryset = Subrabbit.objects.all()
     lookup_field = 'name'
@@ -114,7 +114,7 @@ class UnsubscribeView(generics.UpdateAPIView):
         return Response({'message': 'unsubscribed successfully'} ,status=status.HTTP_204_NO_CONTENT)
 
 class CreatePostView(APIView):
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticated]
     authentication_classes = [CustomAuthentication]
     def post(self, request):
         content = request.data.get('content')
@@ -131,6 +131,7 @@ class CreatePostView(APIView):
         return Response({'message': 'successfully created'}, status=status.HTTP_204_NO_CONTENT)
 
 class VoteView(APIView):
+    permission_classes = [IsAuthenticated]
     authentication_classes = [CustomAuthentication]
     def patch(self, request, format=None):
         user = request.user
@@ -197,6 +198,64 @@ class SubrabbitPostsList(generics.ListAPIView):
         queryset = queryset.order_by('-net_votes', '-num_comments', '-created_at')
         
         return queryset
+
+class PostDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+    lookup_url_kwarg = 'pk'
+
+    def delete(self, request, *args, **kwargs):
+        response = super().delete(request, *args, **kwargs)
+        if response.status_code == status.HTTP_204_NO_CONTENT:
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return response
+
+class CreateComment(generics.CreateAPIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [CustomAuthentication]
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
+    def create(self, request, *args, **kwargs):
+        data = request.data.copy()  # Make a mutable copy
+        post = Post.objects.get(id=data['postId'])
+        parent_comment = None
+        if 'replyToId' in data:
+            parent_comment = Comment.objects.get(id=data['replyToId'])
+        data['parent_post'] = post.id
+        if parent_comment:
+            data['parent_comment_id'] = parent_comment.id
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+class CommentVoteView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [CustomAuthentication]
+    def patch(self, request, format=None):
+        user = request.user
+        comment_id = request.data.get('commentId')
+        vote_type = request.data.get('voteType')
+        if not comment_id or not vote_type:
+            return Response({'detail': 'Missing required fields'}, status=status.HTTP_400_BAD_REQUEST)
+        comment = get_object_or_404(Comment, id=comment_id)
+        if vote_type not in [VoteType.UP, VoteType.DOWN]:
+            return Response({'detail': 'Invalid vote type'}, status=status.HTTP_400_BAD_REQUEST)
+        vote, created = CommentVote.objects.get_or_create(user=user, comment=comment, defaults={'type': vote_type})
+        if not created:
+            if vote.type == vote_type:
+                vote.delete()
+            else:
+                vote.type = vote_type
+                vote.save()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 @api_view(['GET'])

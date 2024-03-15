@@ -11,7 +11,6 @@ export type Subrabbit = {
     isSubscriber: string;
 };
 
-// subrabbitTypes.ts
 export interface SubrabbitData {
     id: number;
     name: string;

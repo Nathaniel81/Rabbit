@@ -80,11 +80,11 @@ class Comment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    @property
-    def net_votes(self):
-        upvotes = self.comment_votes.filter(type=VoteType.UP).count()
-        downvotes = self.comment_votes.filter(type=VoteType.DOWN).count()
-        return upvotes - downvotes
+    # @property
+    # def net_votes(self):
+    #     upvotes = self.comment_votes.filter(type=VoteType.UP).count()
+    #     downvotes = self.comment_votes.filter(type=VoteType.DOWN).count()
+    #     return upvotes - downvotes
 
     def __str__(self):
         return f"{self.author}'s comment on \"{self.parent_post}\""

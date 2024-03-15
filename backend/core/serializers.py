@@ -19,13 +19,14 @@ class SubrabbitSerializer(serializers.ModelSerializer):
 
 class ParentCommentSerializer(serializers.ModelSerializer):
     comment_votes = VoteSerializer(many=True, read_only=True)
+    author = UserSerializer(read_only=True)
     class Meta:
         model = Comment
         fields = '__all__'
 
 class CommentSerializer(serializers.ModelSerializer):
     comment_votes = VoteSerializer(many=True, read_only=True)
-    net_votes = serializers.SerializerMethodField()
+    # net_votes = serializers.SerializerMethodField()
     author = UserSerializer(read_only=True)
     parent_comment = ParentCommentSerializer(read_only=True)
     parent_comment_id = serializers.PrimaryKeyRelatedField(
@@ -36,10 +37,10 @@ class CommentSerializer(serializers.ModelSerializer):
         model = Comment
         fields = '__all__'
 
-    def get_net_votes(self, obj):
-        upvotes = obj.comment_votes.filter(type=VoteType.UP).count()
-        downvotes = obj.comment_votes.filter(type=VoteType.DOWN).count()
-        return upvotes - downvotes
+    # def get_net_votes(self, obj):
+    #     upvotes = obj.comment_votes.filter(type=VoteType.UP).count()
+    #     downvotes = obj.comment_votes.filter(type=VoteType.DOWN).count()
+    #     return upvotes - downvotes
 
 class PostSerializer(serializers.ModelSerializer):
     content = serializers.JSONField(read_only=True)

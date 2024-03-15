@@ -16,26 +16,25 @@ import { useQueryClient } from '@tanstack/react-query';
 
 
 interface PostVoteProps {
-  postId: string
-  initialVotesAmt: number
-  initialVote?: VoteType | null
+  postId: string | null | undefined
+  initialVotesAmt?: number
+  initialVote: VoteType | null | undefined
 }
 
 const PostVote = ({
   postId,
-  initialVotesAmt,
-  initialVote,
+  initialVotesAmt = 0,
+  initialVote = null,
 }: PostVoteProps) => {
 
-  const [votesAmt, setVotesAmt] = useState<number>(initialVotesAmt)
-  const [currentVote, setCurrentVote] = useState(initialVote)
-  const prevVote = usePrevious(currentVote)
+  const [votesAmt, setVotesAmt] = useState<number>(initialVotesAmt);
+  const [currentVote, setCurrentVote] = useState(initialVote);
+  const prevVote = usePrevious(currentVote);
   const { toast } = useToast();
   const dispatch = useDispatch<AppDispatch>();
 
   const queryClient = useQueryClient();
   const queryKey = ['posts']
-//   const data = queryClient.getQueryData(queryKey);
 
 
   useEffect(() => {
@@ -46,7 +45,7 @@ const PostVote = ({
     mutationFn: async (type: VoteType) => {
       const payload: PostVoteRequest = {
         voteType: type,
-        postId: postId,
+        postId: postId ?? '',
       }
       const config = {
         withCredentials: true,
@@ -71,7 +70,8 @@ const PostVote = ({
       else setVotesAmt((prev) => prev + 1)
 
       // reset current vote
-      setCurrentVote(prevVote)
+      const prevVoteOrDefault = prevVote || null;
+      setCurrentVote(prevVoteOrDefault)
 
       if (err instanceof AxiosError) {
         if (err.response?.status === 401) {
@@ -88,7 +88,7 @@ const PostVote = ({
     onMutate: (type: VoteType) => {
       if (currentVote === type) {
         // User is voting the same way again, so remove their vote
-        setCurrentVote(undefined)
+        setCurrentVote(null)
         if (type === 'UP') setVotesAmt((prev) => prev - 1)
         else if (type === 'DOWN') setVotesAmt((prev) => prev + 1)
       } else {

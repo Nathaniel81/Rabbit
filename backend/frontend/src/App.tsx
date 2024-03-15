@@ -6,6 +6,7 @@ import UsersPage from './pages/UsersPage';
 import CreateSubrabbitPage from './pages/CreateSubrabbitPage';
 import SubrabbitDetailPage from './pages/SubrabbitDetailPage';
 import CreatePostPage from './pages/CreatePostPage';
+import PostDetailPage from './pages/PostDetailPage';
 
 import AuthenticationModal from './components/AuthenticationModal';
 import Navbar from './components/Navbar';
@@ -24,6 +25,7 @@ function App() {
               <Route path="/r/create" element={<CreateSubrabbitPage />} />
               <Route path="/r/:slug" element={<SubrabbitDetailPage />} />
               <Route path="/r/:slug/submit" element={<CreatePostPage />} />
+              <Route path="/r/:slug/post/:id" element={<PostDetailPage />} />
             </Routes>
         </Router>
         <AuthenticationModal />
