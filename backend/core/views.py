@@ -258,12 +258,12 @@ class CommentVoteView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 class SearchView(generics.ListAPIView):
-    serializer_class = SubredditSerializer
+    serializer_class = SubrabbitSerializer
     def get_queryset(self):
         q = self.request.query_params.get('q', None)
         if q is not None:
-            return Subreddit.objects.filter(name__startswith=q)[:5]
-        return Subreddit.objects.none()
+            return Subrabbit.objects.filter(name__startswith=q)[:5]
+        return Subrabbit.objects.none()
 
 
 @api_view(['GET'])
