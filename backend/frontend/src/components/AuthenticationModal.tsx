@@ -1,7 +1,6 @@
 import { Button } from '@/components/ui/Button'
 import { Icons } from '@/components/Icons'
 import { cn } from '@/lib/utils'
-// import { useToast } from '@/hooks/use-toast'
 import { X } from 'lucide-react'
 import { FC } from 'react'
 import { useSelector } from 'react-redux'
@@ -12,9 +11,7 @@ import { RootState } from '@/redux/rootReducer'
 
 
 const AuthenticationModal: FC = () => {
-
     const isLoading = false;
-    // const { toast } = useToast();
     const modalState = useSelector((state: RootState) => state.modal);
     const { isOpen, modalType } = modalState;
     const dispatch = useDispatch();

@@ -7,23 +7,22 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios, { AxiosError } from 'axios'
 import { ArrowBigDown, ArrowBigUp } from 'lucide-react'
 import { FC, useState } from 'react'
-import { useSelector, useDispatch } from 'react-redux';
-import { AppDispatch, RootState } from '@/redux/store'
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '@/redux/store'
 import { openModal } from '@/redux/slices/modalSlice';
 import { getCsrfToken } from '@/lib/utils';
-
-// type PartialVote = Pick<CommentVote, 'type'>
+import { Votes } from '@/types/post';
 
 interface CommentVotesProps {
   commentId: string
   votesAmt: number
-  currentVote?: VoteType
+  currentVote?: Votes | undefined
 }
 
 enum VoteType {
-    UP = 'UP',
-    DOWN = 'DOWN'
-  }
+  UP = 'UP',
+  DOWN = 'DOWN'
+}
 
 
 const CommentVotes: FC<CommentVotesProps> = ({
@@ -31,11 +30,6 @@ const CommentVotes: FC<CommentVotesProps> = ({
   votesAmt: _votesAmt,
   currentVote: _currentVote,
 }) => {
-//   const postDetails = useSelector((state: RootState) => state.postDetail);
-//   const { post } = postDetails;
-
-//   const userLogin = useSelector((state: RootState) => state.userLogin);
-//   const { userInfo } = userLogin;
 
   const dispatch = useDispatch<AppDispatch>();
   const [votesAmt, setVotesAmt] = useState<number>(_votesAmt)
@@ -95,6 +89,7 @@ const CommentVotes: FC<CommentVotesProps> = ({
         else if (type === 'DOWN') setVotesAmt((prev) => prev + 1)
       } else {
         // User is voting in the opposite direction, so subtract 2
+        // @ts-expect-error __ _
         setCurrentVote({ type })
         if (type === 'UP') setVotesAmt((prev) => prev + (currentVote ? 2 : 1))
         else if (type === 'DOWN')
@@ -107,7 +102,7 @@ const CommentVotes: FC<CommentVotesProps> = ({
     <div className='flex gap-1'>
       {/* upvote */}
       <Button
-        onClick={() => vote('UP')}
+        onClick={() => vote(VoteType.UP)}
         size='xs'
         variant='ghost'
         aria-label='upvote'>
@@ -125,7 +120,7 @@ const CommentVotes: FC<CommentVotesProps> = ({
 
       {/* downvote */}
       <Button
-        onClick={() => vote('DOWN')}
+        onClick={() => vote(VoteType.DOWN)}
         size='xs'
         className={cn({
           'text-emerald-500': currentVote?.type === 'DOWN',

@@ -34,8 +34,11 @@
     "axios": "^1.6.7",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
+    "cmdk": "^1.0.0",
     "date-fns": "^3.4.0",
     "editorjs-react-renderer": "^3.5.1",
+    "lodash": "^4.17.21",
+    "lodash.debounce": "^4.0.8",
     "lucide-react": "^0.349.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -48,6 +51,7 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@types/lodash": "^4.17.0",
     "@types/node": "^20.11.25",
     "@types/react": "^18.2.56",
     "@types/react-dom": "^18.2.19",

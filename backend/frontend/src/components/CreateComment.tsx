@@ -24,7 +24,6 @@ const CreateComment: FC<CreateCommentProps> = ({ postId, replyToId }) => {
   const dispatch = useDispatch<AppDispatch>();
   const [input, setInput] = useState<string>('');
 
-
   const { mutate: comment, isPending } = useMutation({
     mutationFn: async ({ postId, content, replyToId }: CommentRequest) => {
       const payload: CommentRequest = { postId, content, replyToId }
@@ -47,12 +46,12 @@ const CreateComment: FC<CreateCommentProps> = ({ postId, replyToId }) => {
     onError: (err) => {
       if (err instanceof AxiosError) {
         if (err.response?.status === 401) {
-            dispatch(openModal('signin'))
-            return toast({
-                title: 'Unauthorized',
-                description: 'Please Login.',
-                variant: 'destructive',
-              });
+          dispatch(openModal('signin'))
+          return toast({
+              title: 'Unauthorized',
+              description: 'Please Login.',
+              variant: 'destructive',
+          });
         }
       }
 

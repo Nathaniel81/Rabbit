@@ -10,10 +10,11 @@ export default defineConfig({
     proxy: {
       '/api': 'http://127.0.0.1:8000',
       '/media': 'http://127.0.0.1:8000',
-      //   '/image/': {
-      //     target: 'http://res.cloudinary.com/dpzvkmwpb',
-      //     changeOrigin: true,
-        // },
+      // '/image': 'http://127.0.0.1:8000',
+        '/image/': {
+          target: 'http://res.cloudinary.com/dpzvkmwpb',
+          changeOrigin: true,
+        },
     },
   },
   resolve: {

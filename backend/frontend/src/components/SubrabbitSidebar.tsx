@@ -1,15 +1,17 @@
 import { Button, buttonVariants } from '@/components/ui/Button';
 import { useToast } from '@/hooks/useToast';
-import { SubscribeToSubrabbitPayload, SubrabbitSubscriptionValidator } from '@/lib/validators/subrabbit';
+import { getCsrfToken, handleAxiosError } from '@/lib/utils';
+import {
+  SubrabbitSubscriptionValidator,
+  SubscribeToSubrabbitPayload
+} from '@/lib/validators/subrabbit';
 import { AppDispatch, RootState } from '@/redux/store';
+import { SubrabbitData } from '@/types/subrabbit';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { format } from 'date-fns';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { handleAxiosError, getCsrfToken } from '@/lib/utils';
-import { SubrabbitData } from '@/types/subrabbit';
-
 
 
 const SubrabbitSidebar = () => {

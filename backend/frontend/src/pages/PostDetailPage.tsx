@@ -49,6 +49,9 @@ const PostDetailPage = () => {
         (vote) => vote.user === user?.user_id
       )
     //   const prevVote = usePrevious(currentVote)
+    if (!post) {
+      return <div>Loading...</div>;
+    }
 
   return (
     <div className='sm:container max-w-7xl mx-auto h-full pt-12 mt-4'>

@@ -5,27 +5,26 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import axios from 'axios'
 import { MessageSquare } from 'lucide-react'
 import { useRef, useState } from 'react'
-import { Textarea } from '../ui/Textarea'
 import { Label } from '../ui/Label'
+import { Textarea } from '../ui/Textarea'
 
-import CommentVotes from './CommentVotes'
 import { useToast } from '@/hooks/useToast'
-import { useSelector } from 'react-redux';
-import { RootState } from '@/redux/store'
-import { useEffect } from 'react'
-import { Button } from '../ui/Button'
 import { getCsrfToken } from '@/lib/utils'
-import { Avatar } from '../ui/Avatar'
-
-import { Comment } from '@/types/post'
-import { VoteType } from '@/types/post'
-
+import { openModal } from '@/redux/slices/modalSlice'
+import { AppDispatch, RootState } from '@/redux/store'
+import { Comment, Votes } from '@/types/post'
+import { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { Icons } from '../Icons'
+import { Avatar, AvatarFallback } from '../ui/Avatar'
+import { Button } from '../ui/Button'
+import CommentVotes from './CommentVotes'
 
 interface PostCommentProps {
     comment: Comment
     votesAmt: number
-    currentVote: VoteType
-    postId: string | undefined | null
+    currentVote?: Votes | undefined
+    postId?: string | undefined | null
 }
 
 const PostComment = ({
@@ -34,16 +33,15 @@ const PostComment = ({
   currentVote,
   postId,
 }: PostCommentProps) => {
-  
-    // const dispatch = useDispatch<AppDispatch>();
-    const [input, setInput] = useState<string>('');
-    const userLogin = useSelector((state: RootState) => state.userInfo);
-    const { user } = userLogin;
-    const [isReplying, setIsReplying] = useState<boolean>(false);
-    const commentRef = useRef<HTMLDivElement>(null);
-    const { toast } = useToast();
-    const queryClient = useQueryClient();
-    const queryKey = ['postDetail'];
+  const dispatch = useDispatch<AppDispatch>();
+  const [input, setInput] = useState<string>('');
+  const userLogin = useSelector((state: RootState) => state.userInfo);
+  const { user } = userLogin;
+  const [isReplying, setIsReplying] = useState<boolean>(false);
+  const commentRef = useRef<HTMLDivElement>(null);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const queryKey = ['postDetail'];
 
   useOnClickOutside(commentRef, () => {
     setIsReplying(false)
@@ -78,6 +76,7 @@ const PostComment = ({
     onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: queryKey, exact: true })
         setInput('')
+        setIsReplying(false)
       },
   })
 
@@ -126,8 +125,11 @@ const PostComment = ({
               />
               <Button
                 onClick={() => {
-                //   if (!session) return router.push('/sign-in')
-                  setIsReplying(true)
+                  if (!user) {
+                    dispatch(openModal('signin'))
+                  } else {
+                    setIsReplying(true)
+                  }
                 }}
                 variant='ghost'
                 size='xs'>
@@ -167,9 +169,9 @@ const PostComment = ({
                         onClick={() => {
                           if (!input) return
                           postComment({
-                            postId,
+                            postId: postId || '',
                             content: input,
-                            replyToId: comment.parent_comment?.id ?? comment.id, // default to top-level comment
+                            replyToId: comment.parent_comment?.id ?? comment.id,
                           })
                         }}>
                         Post

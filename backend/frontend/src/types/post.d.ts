@@ -16,6 +16,9 @@ type Comment = {
     text: string;
     parent_comment?: Comment;
     comment_votes: Votes[];
+    created_at: string;
+    content: any;
+    author: Author;
 }
 
 export type Post = {
