@@ -28,6 +28,7 @@ class User(AbstractUser):
     email = models.EmailField(unique=True)
     # profile_picture = models.ImageField(upload_to='profile_pictures/', default='no-image.png', null=True, blank=True)
     profile_picture = CloudinaryField('image', null=True, blank=True)
+    github_id = models.IntegerField(null=True, unique=True)
 
     # USERNAME_FIELD = 'email'
     # REQUIRED_FIELDS = []
