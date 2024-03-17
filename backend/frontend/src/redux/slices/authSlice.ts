@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import axios, { AxiosError } from 'axios';
 
+
 interface User {
   user_id: string;
   username: string;
@@ -46,18 +47,29 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     resetUserInfo: () => initialState,
+    updateUsername: (state, action: PayloadAction<string>) => {
+      if (state.user) {
+        state.user.username = action.payload;
+      }
+    },
+    updateProfilePicture: (state, action: PayloadAction<string>) => {
+      if (state.user) {
+        state.user.profile_picture = action.payload;
+      }
+    },
+    
   },
   extraReducers: (builder) => {
     builder
-      .addCase(loginWithGithub.pending, (state) => {
+      .addCase(loginWithGithub.pending, (state: AuthState) => {
         state.loading = true;
       })
-      .addCase(loginWithGithub.fulfilled, (state, action: PayloadAction<User>) => {
+      .addCase(loginWithGithub.fulfilled, (state: AuthState, action: PayloadAction<User>) => {
         state.loading = false;
         state.user = action.payload;
         state.error = null;
       })
-      .addCase(loginWithGithub.rejected, (state, action: PayloadAction<unknown>) => {
+      .addCase(loginWithGithub.rejected, (state: AuthState, action: PayloadAction<unknown>) => {
         state.loading = false;
         state.user = null;
         state.error = action.payload ? String(action.payload) : null;
@@ -66,4 +78,8 @@ const authSlice = createSlice({
 });
 
 export default authSlice.reducer;
-export const { resetUserInfo } = authSlice.actions;
+export const { 
+  resetUserInfo, 
+  updateUsername, 
+  updateProfilePicture 
+} = authSlice.actions;
