@@ -14,14 +14,16 @@ from .models import User
 
 class UserSerializer(serializers.ModelSerializer):
     load_dotenv()
-    profile_picture = serializers.SerializerMethodField()
 
     class Meta:
         model = User
         fields = ('id', 'username', 'email', 'profile_picture',)
 
     def get_profile_picture(self, obj):
-        return f"https://res.cloudinary.com/{os.getenv('CLOUDINARY_NAME')}/{obj.profile_picture}"
+        if obj.profile_picture:
+            return f"https://res.cloudinary.com/{os.getenv('CLOUDINARY_NAME')}/{obj.profile_picture}"
+        return None
+
 
 def get_tokens_for_user(user):
     refresh = RefreshToken.for_user(user)
@@ -39,6 +41,7 @@ class GithubLoginSerializer(serializers.Serializer):
         if access_token:
             user_data = Github.get_github_user(access_token)
             github_username = user_data['login']
+            github_id = user_data['id']
             emails_data = Github.get_github_emails(access_token)
             primary_email = next((email for email in emails_data if email.get('primary')), None)
 
@@ -46,11 +49,11 @@ class GithubLoginSerializer(serializers.Serializer):
                 email = primary_email.get('email')
 
             try:
-                user = User.objects.get(username=github_username)
+                user = User.objects.get(github_id=github_id)
                 user.email = email
                 user.save()
             except User.DoesNotExist:
-                user = User.objects.create_user(username=github_username, email=email)
+                user = User.objects.create_user(username=user_data['login'], email=email, github_id=github_id)
 
             serialized_user = UserSerializer(user).data
 
@@ -62,13 +65,6 @@ class GithubLoginSerializer(serializers.Serializer):
             serialized_user['access_token'] = access_token
             serialized_user['refresh_token'] = refresh_token
 
-            # return {
-            #     'access_token': access_token,
-            #     'refresh_token': refresh_token,
-            #     'user_id': user.id,
-            #     'username': github_username,
-            #     'email': email,
-            # }
             return serialized_user
         else:
             raise serializers.ValidationError("Unable to fetch access token from GitHub.")
