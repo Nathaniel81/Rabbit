@@ -1,5 +1,5 @@
 import requests
-# from accounts.authenticate import CustomAuthentication
+from accounts.authenticate import CustomAuthentication
 from django.conf import settings
 from django.contrib.auth import authenticate
 from django.core.exceptions import ValidationError
@@ -16,6 +16,8 @@ from rest_framework_simplejwt import tokens
 
 from .models import User
 from .serializers import GithubLoginSerializer, UserSerializer
+from django.core.exceptions import ValidationError
+from rest_framework.permissions import IsAuthenticated
 
 
 class GetAllUsers(generics.ListAPIView):
@@ -43,9 +45,6 @@ class GithubOauthSignInView(APIView):
                     'username': code_data.get('username'),
                     'email': code_data.get('email'),
                     'profile_picture': code_data.get('profile_picture'),
-                    # 'access_token': access_token,
-                    # 'refresh_token': refresh_token
-
                 }, status=status.HTTP_200_OK)
 
                 response.set_cookie(
@@ -139,3 +138,46 @@ class LogoutView(APIView):
         except Exception as e:
             print(e)
             raise exceptions.ParseError("Invalid token")
+
+class UpdateUsernameView(generics.UpdateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    authentication_classes = [CustomAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def update(self, request, *args, **kwargs):
+        username = request.data.get('username')
+        if not username:
+            return Response('Invalid input', status=400)
+        user = request.user
+        try:
+            user.full_clean()
+            user.username = username
+            user.save()
+            return Response({'username': user.username}, status=200)
+        except ValidationError as e:
+            return Response(str(e), status=400)
+
+class UpdateProfilePictureView(generics.UpdateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    authentication_classes = [CustomAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def update(self, request, *args, **kwargs):
+        profile_picture = request.FILES.get('profile_picture')
+
+        if not profile_picture:
+            return Response('Invalid input', status=400)
+
+        user = request.user
+        user.profile_picture = profile_picture
+
+        try:
+            user.full_clean()
+            user.save()
+            serializer = self.serializer_class(user)
+            profile_picture = serializer.data.get('profile_picture')
+            return Response({'profile_picture': profile_picture}, status=200)
+        except ValidationError as e:
+            return Response(str(e), status=400)
