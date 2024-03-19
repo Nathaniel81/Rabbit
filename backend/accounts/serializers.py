@@ -7,21 +7,28 @@ from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
+from cloudinary.utils import cloudinary_url
 
 from .github import Github
 from .models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
-    load_dotenv()
+    profile_picture = serializers.SerializerMethodField()
+    # load_dotenv()
 
     class Meta:
         model = User
         fields = ('id', 'username', 'email', 'profile_picture',)
 
+    # def get_profile_picture(self, obj):
+    #     if obj.profile_picture:
+    #         return f"https://res.cloudinary.com/{os.getenv('CLOUDINARY_NAME')}/{obj.profile_picture}"
+    #     return None
     def get_profile_picture(self, obj):
         if obj.profile_picture:
-            return f"https://res.cloudinary.com/{os.getenv('CLOUDINARY_NAME')}/{obj.profile_picture}"
+            return cloudinary_url(obj.profile_picture.public_id)[0]
+
         return None
 
 
