@@ -63,10 +63,10 @@ const SearchBar = () => {
             {isFetching && <Loader2 className='h-5 w-5 animate-spin text-zinc-500' />}
           </div>
           <div className='text-sm'>
-            {isFetched && !isFetching && (queryResults?.results?.length === 0) && <div className='p-2'>No results found.</div>}
-            {(queryResults?.results?.length ?? 0) > 0 && (
+            {isFetched && !isFetching && (queryResults?.length === 0) && <div className='p-2'>No results found.</div>}
+            {(queryResults?.length ?? 0) > 0 && (
               <>
-                {queryResults?.results?.map((subrabbit: Subrabbit, index: number) => (
+                {queryResults?.map((subrabbit: Subrabbit, index: number) => (
                   <div
                   onClick={() => {
                     setInput('');

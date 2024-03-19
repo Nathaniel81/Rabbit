@@ -18,7 +18,7 @@ from .permissions import IsAuthenticatedOrReadOnly
 from .serializers import (PostSerializer, SubrabbitSerializer,
                           SubrabbitSerializer_detailed, CommentSerializer)
 from rest_framework.pagination import PageNumberPagination
-
+from django.core.cache import cache
 
 class SubrabbitListCreateView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticatedOrReadOnly]
@@ -158,24 +158,6 @@ class VoteView(APIView):
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-# class PostListView(generics.ListAPIView):
-#     serializer_class = PostSerializer
-#     permission_classes = [IsAuthenticatedOrReadOnly]
-
-#     def get_queryset(self):
-#         user = self.request.user
-#         queryset = Post.objects.annotate(
-#             upvotes=Count('votes', filter=Q(votes__type=VoteType.UP)),
-#             downvotes=Count('votes', filter=Q(votes__type=VoteType.DOWN))
-#         ).annotate(net_votes=F('upvotes') - F('downvotes'))
-
-#         queryset = queryset.annotate(num_comments=Count('comments'))
-#         if user.is_authenticated:
-#             queryset = queryset.filter(subrabbit__subscribers=user)
-        
-#         queryset = queryset.order_by('-net_votes', '-num_comments', '-created_at')
-        
-#         return queryset
 class PostPagination(PageNumberPagination):
     page_size = 3
 
@@ -187,24 +169,45 @@ class PostListView(generics.ListAPIView):
     def get_queryset(self):
         user = self.request.user
         subrabbit_name = self.request.query_params.get('subrabbitName')
-        queryset = Post.objects.all()
+        page = self.request.query_params.get('page')
+
+        if page == '1':
+            cached_posts = cache.get(f'posts:{subrabbit_name}:page1')
+            if cached_posts is not None:
+                print('Posts from cache')
+                return cached_posts
+        posts = self.fetch_posts(subrabbit_name, user)
+
+        if page == '1':
+            cache.set(f'posts:{subrabbit_name}:page1', posts)
+        
+        return posts
+
+    def fetch_posts(self, subrabbit_name, user):
+        print('posts from db')
+        posts = Post.objects.all()
         if subrabbit_name:
-            # Filter posts by subrabbit name
-            queryset = queryset.filter(subrabbit__name=subrabbit_name)
-
-        # Annotate posts
-        queryset = queryset.annotate(
-            upvotes=Count('votes', filter=Q(votes__type=VoteType.UP)),
-            downvotes=Count('votes', filter=Q(votes__type=VoteType.DOWN))
-        ).annotate(net_votes=F('upvotes') - F('downvotes'))
-
+            posts = posts.filter(subrabbit__name=subrabbit_name)
         if user.is_authenticated:
-            # If user is authenticated, personalize the queryset
-            queryset = queryset.filter(subrabbit__subscribers=user)
-        queryset = queryset.annotate(num_comments=Count('comments'))
-        # Order queryset
-        queryset = queryset.order_by('-net_votes', '-num_comments', '-created_at')
-        return queryset
+            posts = posts.filter(subrabbit__subscribers=user)
+        posts = posts.annotate(
+            upvotes=Count('votes', filter=Q(votes__type=VoteType.UP)),
+            downvotes=Count('votes', filter=Q(votes__type=VoteType.DOWN)),
+            net_votes=F('upvotes') - F('downvotes'),
+            num_comments=Count('comments')
+        )
+        
+        # Order by net_votes descending, created_at descending, and num_comments descending
+        posts = posts.order_by('-net_votes', '-created_at', '-num_comments')
+
+        return list(posts)
+        posts = posts.order_by('-created_at')
+        return posts
+
+    def list(self, request, *args, **kwargs):
+        response = super().list(request, *args, **kwargs)
+        return response
+
 
 class SubrabbitPostsList(generics.ListAPIView):
     serializer_class = PostSerializer
@@ -225,7 +228,7 @@ class SubrabbitPostsList(generics.ListAPIView):
         queryset = queryset.annotate(num_comments=Count('comments'))
         
         # Order by net_votes descending and number of comments descending
-        queryset = queryset.order_by('-net_votes', '-num_comments', '-created_at')
+        queryset = queryset.order_by('-net_votes', '-created_at', '-num_comments')
         
         return queryset
 

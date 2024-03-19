@@ -63,11 +63,13 @@ const PostFeed = () => {
 })
 
 const posts = data?.pages.flatMap((page) => page)
-  useEffect(() => {
-    if (entry?.isIntersecting && posts && posts[posts?.length - 1]?.next) {
-      fetchNextPage() // Load more posts when the last post comes into view
-    }
-  }, [entry, fetchNextPage, posts])
+useEffect(() => {
+  if (entry?.isIntersecting && posts && posts[posts?.length - 1]?.next) {
+    fetchNextPage() // Load more posts when the last post comes into view
+  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [entry, fetchNextPage])
+
 
   return (
     <ul className='flex flex-col col-span-2 space-y-6'>
