@@ -1,83 +1,116 @@
 import { useSelector } from 'react-redux'
 import { RootState } from '@/redux/store'
-import { formatTimeToNow } from "@/lib/utils"
-import { MessageSquare } from 'lucide-react'
-import { Link } from "react-router-dom"
-import { useRef } from "react"
-import EditorOutput from './EditorOutput'
-import { Post } from '@/types/post'
-import PostVote from './PostVote'
+// import { formatTimeToNow } from "@/lib/utils"
+// import { MessageSquare } from 'lucide-react'
+// import { Link } from "react-router-dom"
+// import EditorOutput from './EditorOutput'
+import { Post as PostType } from '@/types/post'
+// import PostVote from './PostVote'
+import Post from './Post'
+import { useIntersection } from '@mantine/hooks'
+import { Loader2 } from 'lucide-react'
+import { useEffect, useRef } from 'react'
+// import { useInfiniteQuery } from 'react-query'
+// import { useInfiniteQuery } from '@tanstack/react-query'
+import { useInfiniteQuery } from '@tanstack/react-query'
+import axios from 'axios'
+import { useParams } from 'react-router-dom'
+import { Votes } from '@/types/post'
+import { getCsrfToken } from '@/lib/utils'
 
 
-const PostFeed = ({ posts }: { posts: Post[] }) => {
-  const pRef = useRef<HTMLParagraphElement>(null)
+const PostFeed = () => {
   const userLogin = useSelector((state: RootState) => state.userInfo);
   const { user } = userLogin;
-  
+  const INFINITE_SCROLL_PAGINATION_RESULTS = 3
+  const { slug } = useParams()
+
+  const subrabbitName = slug || ''
+
+  const lastPostRef = useRef<HTMLElement>(null)
+  const { ref, entry } = useIntersection({
+    root: lastPostRef.current,
+    threshold: 1,
+  })
+
+  const config = {
+    withCredentials: true,
+    headers: {
+      "Content-Type": "application/json",
+      "x-csrftoken": getCsrfToken()
+    },
+  }
+
+  const { 
+    data, 
+    fetchNextPage, 
+    isFetchingNextPage 
+} = useInfiniteQuery({
+    queryKey: ['infinite-query', slug],
+    queryFn: async ({ pageParam = 1 }) => {
+        const query =
+            `/api/posts?limit=${INFINITE_SCROLL_PAGINATION_RESULTS}&page=${pageParam}` +
+            (subrabbitName ? `&subrabbitName=${subrabbitName}` : '')
+
+        const { data } = await axios.get(query, config)
+        return data
+    },
+    initialPageParam: 1,
+    getNextPageParam: (_, pages) => {
+        return pages.length + 1
+    },
+    // initialData: { pages: [initialPosts], pageParams: [1] },
+})
+
+const posts = data?.pages.flatMap((page) => page)
+  useEffect(() => {
+    if (entry?.isIntersecting && posts && posts[posts?.length - 1]?.next) {
+      fetchNextPage() // Load more posts when the last post comes into view
+    }
+  }, [entry, fetchNextPage, posts])
+
   return (
     <ul className='flex flex-col col-span-2 space-y-6'>
-      {posts?.map((post, index) => {
-        const votesAmt = post.votes.reduce((acc, vote) => {
+      {posts?.map((postItem, postIndex) => postItem?.results?.map((post: PostType, index: number) => {
+        const votesAmt = post.votes.reduce((acc: number, vote: Votes) => {
           if (vote.type === 'UP') return acc + 1
           if (vote.type === 'DOWN') return acc - 1
           return acc
         }, 0)
         const currentVote = post.votes.find(
-          (vote) => vote.user === user?.user_id
+          (vote: Votes) => vote.user === user?.user_id
         )
-        return (
-          <li key={index}>
-            <div className='rounded-md bg-white shadow'>
-              <div className='px-6 py-4 flex justify-between'>
-                  <PostVote
-                    postId={post.id}
-                    initialVotesAmt={votesAmt}
-                    initialVote={currentVote?.type}
-                  />
-                  <div className='w-0 flex-1'>
-                    <div className='max-h-40 mt-1 text-xs text-gray-500'>
-                      {post?.subrabbit.name ? (
-                        <>
-                          <Link
-                            className='underline text-zinc-900 text-sm underline-offset-2'
-                            to={`/r/${post?.subrabbit.name}`}>
-                            r/{post?.subrabbit.name}
-                          </Link>
-                          <span className='px-1'>•</span>
-                        </>
-                      ) : null}
-                      <span>Posted by u/{post.author.username}</span>{' '}
-                      {formatTimeToNow(new Date(post.created_at))}
-                    </div>
-                      <Link to={`/r/${post?.subrabbit.name}/post/${post.id}`}>
-                        <h1 className='text-lg font-semibold py-2 leading-6 text-gray-900'>
-                          {post.title || post.id}
-                        </h1>
-                      </Link>
-                      <div className='relative text-sm max-h-40 w-full overflow-clip' ref={pRef}> 
-                        <EditorOutput content={post.content} />
-                        {pRef.current?.clientHeight === 160 ? (
-                          <div className='absolute bottom-0 left-0 h-24 w-full bg-gradient-to-t from-white to-transparent'>
-                          </div>
-                        ) : null}
-                      </div>
-                  </div>
-              </div>
-              <div className='bg-gray-50 z-20 text-sm px-4 py-4 sm:px-6'>
-                <Link
-                  to={`/r/${post?.subrabbit.name}/post/${post.id}`}
-                  className='w-fit flex items-center gap-2'>
-                  <MessageSquare className='h-4 w-4' />
-                  {post?.comments.filter((comment) => !comment.parent_comment).length}
-                  {post?.comments.filter((comment) => !comment.parent_comment).length <= 1 ? ' comment' : ' comments'}
-                </Link>
-              </div>
-            </div>
-          </li>
-        )
-      })}
+  
+        if (index === postItem.results.length - 1 && postIndex === posts.length - 1) {
+          // Add a ref to the last post in the list
+          return (
+            <li key={post.id} ref={ref}>
+              <Post
+                post={post}
+                votesAmt={votesAmt}
+                currentVote={currentVote}
+              />
+            </li>
+          )
+        } else {
+          return (
+            <Post
+              key={post.id}
+              post={post}
+              votesAmt={votesAmt}
+              currentVote={currentVote}
+            />
+          )
+        }
+      }))}
+      {isFetchingNextPage && (
+        <li className='flex justify-center'>
+          <Loader2 className='w-6 h-6 text-zinc-500 animate-spin' />
+        </li>
+      )}
     </ul>
-  )
+  )  
+  
 }              
 
 export default PostFeed

@@ -17,6 +17,7 @@ from .models import Comment, CommentVote, Post, Subrabbit, Vote, VoteType
 from .permissions import IsAuthenticatedOrReadOnly
 from .serializers import (PostSerializer, SubrabbitSerializer,
                           SubrabbitSerializer_detailed, CommentSerializer)
+from rest_framework.pagination import PageNumberPagination
 
 
 class SubrabbitListCreateView(generics.ListCreateAPIView):
@@ -157,23 +158,52 @@ class VoteView(APIView):
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+# class PostListView(generics.ListAPIView):
+#     serializer_class = PostSerializer
+#     permission_classes = [IsAuthenticatedOrReadOnly]
+
+#     def get_queryset(self):
+#         user = self.request.user
+#         queryset = Post.objects.annotate(
+#             upvotes=Count('votes', filter=Q(votes__type=VoteType.UP)),
+#             downvotes=Count('votes', filter=Q(votes__type=VoteType.DOWN))
+#         ).annotate(net_votes=F('upvotes') - F('downvotes'))
+
+#         queryset = queryset.annotate(num_comments=Count('comments'))
+#         if user.is_authenticated:
+#             queryset = queryset.filter(subrabbit__subscribers=user)
+        
+#         queryset = queryset.order_by('-net_votes', '-num_comments', '-created_at')
+        
+#         return queryset
+class PostPagination(PageNumberPagination):
+    page_size = 3
+
 class PostListView(generics.ListAPIView):
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
+    pagination_class = PostPagination
 
     def get_queryset(self):
         user = self.request.user
-        queryset = Post.objects.annotate(
+        subrabbit_name = self.request.query_params.get('subrabbitName')
+        queryset = Post.objects.all()
+        if subrabbit_name:
+            # Filter posts by subrabbit name
+            queryset = queryset.filter(subrabbit__name=subrabbit_name)
+
+        # Annotate posts
+        queryset = queryset.annotate(
             upvotes=Count('votes', filter=Q(votes__type=VoteType.UP)),
             downvotes=Count('votes', filter=Q(votes__type=VoteType.DOWN))
         ).annotate(net_votes=F('upvotes') - F('downvotes'))
 
-        queryset = queryset.annotate(num_comments=Count('comments'))
         if user.is_authenticated:
+            # If user is authenticated, personalize the queryset
             queryset = queryset.filter(subrabbit__subscribers=user)
-        
+        queryset = queryset.annotate(num_comments=Count('comments'))
+        # Order queryset
         queryset = queryset.order_by('-net_votes', '-num_comments', '-created_at')
-        
         return queryset
 
 class SubrabbitPostsList(generics.ListAPIView):

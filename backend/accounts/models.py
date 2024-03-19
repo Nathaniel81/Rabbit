@@ -26,7 +26,6 @@ from cloudinary.models import CloudinaryField, CloudinaryResource
 class User(AbstractUser):
     username = models.CharField(max_length=150, unique=True, blank=True)
     email = models.EmailField(unique=True)
-    # profile_picture = models.ImageField(upload_to='profile_pictures/', default='no-image.png', null=True, blank=True)
     profile_picture = CloudinaryField('image', null=True, blank=True)
     github_id = models.IntegerField(null=True, unique=True)
 

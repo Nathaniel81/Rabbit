@@ -40,24 +40,22 @@ const SubrabbitDetailPage = () => {
     },
   });
 
-  const postsQueryKey = ['posts'];
-  const { data: subrabbitPosts } = useQuery({
-    queryKey: postsQueryKey,
-    queryFn: async () => {
-      const config = {
-        withCredentials: true,
-        headers: {
-          "Content-Type": "application/json",
-          "x-csrftoken": getCsrfToken()
-        },
-      }
-      const response = await axios.get(`/api/subrabbit/${slug}/posts/`, config);
-      const res = await response.data
-      return res;
-    },
-  });
-
-  console.log(subrabbit)
+  // const postsQueryKey = ['posts'];
+  // const { data: subrabbitPosts } = useQuery({
+  //   queryKey: postsQueryKey,
+  //   queryFn: async () => {
+  //     const config = {
+  //       withCredentials: true,
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         "x-csrftoken": getCsrfToken()
+  //       },
+  //     }
+  //     const response = await axios.get(`/api/subrabbit/${slug}/posts/`, config);
+  //     const res = await response.data
+  //     return res;
+  //   },
+  // });
 
   return (
     <div className='sm:container max-w-7xl mx-auto h-full pt-12'>
@@ -67,7 +65,7 @@ const SubrabbitDetailPage = () => {
         <div className='grid grid-cols-1 md:grid-cols-3 gap-y-4 md:gap-x-4 py-6'>
           <ul className='flex flex-col col-span-2 space-y-6'>
             <h1 className='font-bold text-3xl md:text-4xl h-14'>
-              r/{slug}
+              r/{slug ?? subrabbit?.name}
             </h1>
 
             <li className='overflow-hidden rounded-md bg-white shadow'>
@@ -110,7 +108,7 @@ const SubrabbitDetailPage = () => {
               </div>
             </li>
 
-            <PostFeed posts={subrabbitPosts} />
+            <PostFeed />
 
           </ul>
 
