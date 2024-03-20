@@ -92,7 +92,7 @@ const HomePage = () => {
             </dl>
           </div>
           {/* List of popular communities */}
-          <div className="w-full h-fit border  flex-col gap-2 rounded-xl py-3 px-2 bg-secondary hidden lg:flex mt-5">
+          <div className="w-full h-fit border flex-col gap-2 rounded-xl py-3 px-2 bg-secondary hidden lg:flex mt-5">
             <p className="px-3 font-semibold">Popular Communities</p>
               <div className="flex flex-col gap-3">
               {data?.map((subrabbit, index) => (
