@@ -6,16 +6,15 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/DropdownMenu';
 import { useToast } from '@/hooks/useToast';
-import { resetUserInfo } from '@/redux/slices/authSlice';
 import { openModal } from '@/redux/slices/modalSlice';
 import { AppDispatch, RootState } from '@/redux/store';
-import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { Icons } from './Icons';
 import { Avatar, AvatarFallback } from './ui/Avatar';
 import { buttonVariants } from './ui/Button';
 import SearchBar from './SearchBar';
+import { logout } from '@/redux/slices/authSlice';
 
 
 const Navbar = () => {
@@ -23,39 +22,40 @@ const Navbar = () => {
   const navigate = useNavigate();
   const userLogin = useSelector((state: RootState) => state.userInfo);
   const { user } = userLogin;
-  const { toast } = useToast()
+  const { toast } = useToast();
 
   const signIn = () => {
-    dispatch(openModal('signin'))
-  }
+    dispatch(openModal('signin'));
+  };
 
   const logoutHandler = () => {
-    axios.post('/api/user/logout/')
-      .then(response => {
-        console.log('Logged out', response.data);
-        localStorage.removeItem('userInfo')
-        navigate('/')
-        dispatch(resetUserInfo())
+    dispatch(logout())
+      .unwrap()
+      .then(() => {
+        navigate('/');
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Logout failed:', error);
         toast({
           title: "Logout Failed",
           description: "There was a problem logging out. Please try again later.",
           variant: 'destructive',
-        })
+        });
       });
   };
 
   return (
     <div className='fixed top-0 inset-x-0 h-fit bg-zinc-100 border-b border-zinc-300 z-[10] py-2'>
       <div className='box flex items-center justify-between gap-2'>
+        {/* Logo and site name */}
         <Link to='/' className='flex gap-2 items-center'>
           <Icons.logo className='h-10 w-10 sm:h-8 sm:w-8' />
           <p className='hidden text-zinc-700 text-sm font-medium md:block'>Rabbit</p>
         </Link>
-      <div className="flex justify-between gap-5">
+        {/* Search bar */}
         <SearchBar />
+        {/* User actions */}
+        <div className="flex justify-between gap-5">
         {user ? (
           <>
             <DropdownMenu>
@@ -77,6 +77,7 @@ const Navbar = () => {
                     </AvatarFallback>
                   )}
                 </Avatar>
+              {/* Menu items */}
               </DropdownMenuTrigger>
               <DropdownMenuContent className='bg-white' align='end'>
                 <div className='flex items-center justify-start gap-2 p-2'>
@@ -93,11 +94,9 @@ const Navbar = () => {
                 <DropdownMenuItem asChild>
                   <Link to='/'>Feed</Link>
                 </DropdownMenuItem>
-                      
                 <DropdownMenuItem asChild>
                   <Link to='/r/create'>Create Community</Link>
                 </DropdownMenuItem>
-        
                 <DropdownMenuItem asChild>
                   <Link to='/settings'>Settings</Link>
                 </DropdownMenuItem>
