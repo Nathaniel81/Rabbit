@@ -20,10 +20,13 @@ from .serializers import (PostSerializer, SubrabbitSerializer,
 from rest_framework.pagination import PageNumberPagination
 from django.core.cache import cache
 
+
 class SubrabbitListCreateView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticatedOrReadOnly]
     authentication_classes = [CustomAuthentication]
-    queryset = Subrabbit.objects.all().order_by('-created_at')
+    queryset = Subrabbit.objects.annotate(num_members=Count('subscribers')) \
+                             .order_by('-num_members', '-created_at')[:5]
+
 
     # Dynamically select serializer based on HTTP method
     def get_serializer_class(self):
