@@ -22,11 +22,20 @@ from django.core.cache import cache
 
 
 class SubrabbitListCreateView(generics.ListCreateAPIView):
+    """
+    API view to list and create subrabbits.
+
+    GET: Returns a list of subrabbits.
+    POST: Creates a new subrabbit.
+
+    - For GET requests, returns detailed information.
+    - For POST requests, validates input and creates a new subrabbit.
+    """
+
     permission_classes = [IsAuthenticatedOrReadOnly]
     authentication_classes = [CustomAuthentication]
     queryset = Subrabbit.objects.annotate(num_members=Count('subscribers')) \
                              .order_by('-num_members', '-created_at')[:5]
-
 
     # Dynamically select serializer based on HTTP method
     def get_serializer_class(self):
