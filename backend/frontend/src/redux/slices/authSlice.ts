@@ -1,5 +1,10 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { 
+  createSlice, 
+  createAsyncThunk, 
+  PayloadAction 
+} from '@reduxjs/toolkit';
 import axios, { AxiosError } from 'axios';
+import { getCsrfToken } from '@/lib/utils';
 
 
 interface User {
@@ -8,7 +13,6 @@ interface User {
   email: string;
   profile_picture: string;
 }
-
 interface AuthState {
   user: User | null;
   loading: boolean;
@@ -42,6 +46,26 @@ export const loginWithGithub = createAsyncThunk(
   }
 );
 
+export const logout = createAsyncThunk(
+  'auth/logout', 
+  async (_, { rejectWithValue }) => {
+  try {
+    const config = {
+      withCredentials: true,
+      headers: {
+        "Content-Type": "application/json",
+        "x-csrftoken": getCsrfToken()
+      },
+    }
+    const response = await axios.post('/api/user/logout/', config);
+    localStorage.removeItem('userInfo');
+    return response.data;
+  } catch (error) {
+    const err = error as AxiosError;
+    return rejectWithValue(err.response?.data);
+  }
+});
+
 const authSlice = createSlice({
   name: 'auth',
   initialState,
@@ -57,10 +81,12 @@ const authSlice = createSlice({
         state.user.profile_picture = action.payload;
       }
     },
-    
   },
   extraReducers: (builder) => {
     builder
+      .addCase(logout.fulfilled, () => {
+        return initialState;
+      })
       .addCase(loginWithGithub.pending, (state: AuthState) => {
         state.loading = true;
       })
