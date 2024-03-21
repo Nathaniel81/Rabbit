@@ -1,24 +1,22 @@
-from . import views
 from django.urls import path
+from .views import editorjs_views, post_views, subrabbit_views
 
 
 urlpatterns = [
-    path('subrabbits/', views.SubrabbitListCreateView.as_view(), name='subrabbits'),
-    path('subrabbit/<str:name>/', views.SubrabbitDetail.as_view(), name='subrabbit-detail'),
+    path('subrabbits/', subrabbit_views.SubrabbitListCreateView.as_view(), name='subrabbits'),
+    path('subrabbit/<str:name>/', subrabbit_views.SubrabbitDetail.as_view(), name='subrabbit-detail'),
+    path('subrabbit/<str:name>/subscribe/', subrabbit_views.SubscribeView.as_view(), name='subscribe'),
+    path('subrabbit/<str:name>/unsubscribe/', subrabbit_views.UnsubscribeView.as_view(), name='unsubcribe'),
+    path('search/', subrabbit_views.SearchView.as_view(), name='search'),
 
-    path('subrabbit/<str:name>/subscribe/', views.SubscribeView.as_view(), name='subscribe'),
-    path('subrabbit/<str:name>/unsubscribe/', views.UnsubscribeView.as_view(), name='unsubcribe'),
+    path('create-post/', post_views.CreatePostView.as_view(), name='create-post'),
+    path('subrabbit/post/vote/', post_views.VoteView.as_view(), name='post-vote'),
+    path('posts/', post_views.PostListView.as_view(), name='posts'),
+    path('post-detail/<str:pk>/', post_views.PostDetailView.as_view(), name='post-detail'),
+    path('subrabbit/post/comment/', post_views.CreateComment.as_view(), name='create-comment'),
+    path('subrabbit/post/comment/vote/', post_views.CommentVoteView.as_view(), name='comment-vote'),
 
-    path('link/', views.fetch_url_metadata),
-    path('upload-image/', views.upload_image),
-    path('upload-file/', views.upload_file),
-
-    path('create-post/', views.CreatePostView.as_view(), name='create-post'),
-    path('subrabbit/post/vote/', views.VoteView.as_view(), name='post-vote'),
-    path('posts/', views.PostListView.as_view(), name='posts'),
-    path('post-detail/<str:pk>/', views.PostDetailView.as_view(), name='post-detail'),
-    path('subrabbit/<str:subrabbit_name>/posts/', views.SubrabbitPostsList.as_view(), name='subrabbit-posts'),
-    path('subrabbit/post/comment/', views.CreateComment.as_view(), name='create-comment'),
-    path('subrabbit/post/comment/vote/', views.CommentVoteView.as_view(), name='create-vote'),
-    path('search/', views.SearchView.as_view(), name='search'),
+    path('link/', editorjs_views.fetch_url_metadata, name='link'),
+    path('upload-image/', editorjs_views.upload_image, name='image-upload'),
+    path('upload-file/', editorjs_views.upload_file, name='file-upload'),
 ]

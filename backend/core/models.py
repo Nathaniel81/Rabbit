@@ -21,6 +21,7 @@ class Subrabbit(models.Model):
 class Post(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=100, null=True, blank=True)
+    # Field to store content using EditorJs
     content=EditorJsJSONField(
         plugins=[
             "@editorjs/image",
@@ -31,27 +32,23 @@ class Post(models.Model):
             "@editorjs/inline-code",
             "@editorjs/table",
         ],
+        # Configuration for specific tools used in EditorJs
          tools={
                 "Link":{
                     "config":{
                         "endpoint":
-                            'api/link/'
+                            'api/link/'  # API endpoint for handling links
                         }
                 },
                 "Image":{
                     "config":{
                         "endpoints":{
-                            "byFile":'api/upload-file/',
-                            "byUrl":'api/upload-image/'
+                            "byFile":'api/upload-file/',  # API endpoint for uploading files
+                            "byUrl":'api/upload-image/'  # API endpoint for uploading images
                         },
                        
                     }
                 },
-                # "Attaches":{
-                #     "config":{
-                #         "endpoint":'api/upload/'
-                #     }
-                # }
             }
     )
     created_at = models.DateTimeField(auto_now_add=True)
@@ -80,19 +77,15 @@ class Comment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    # @property
-    # def net_votes(self):
-    #     upvotes = self.comment_votes.filter(type=VoteType.UP).count()
-    #     downvotes = self.comment_votes.filter(type=VoteType.DOWN).count()
-    #     return upvotes - downvotes
-
     def __str__(self):
         return f"{self.author}'s comment on \"{self.parent_post}\""
 
 class CommentVote(models.Model):
     user = models.ForeignKey(User, related_name='user_votes', on_delete=models.CASCADE)
-    post = models.ForeignKey(Post, related_name='post_votes', null=True, blank=True, on_delete=models.CASCADE)
-    comment = models.ForeignKey(Comment, related_name='comment_votes', null=True, blank=True, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, related_name='post_votes', null=True, 
+                                                    blank=True, on_delete=models.CASCADE)
+    comment = models.ForeignKey(Comment, related_name='comment_votes', 
+                                        null=True, blank=True, on_delete=models.CASCADE)
     type = models.CharField(max_length=4, choices=VoteType.choices)
 
     class Meta:

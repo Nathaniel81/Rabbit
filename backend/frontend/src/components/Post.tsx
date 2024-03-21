@@ -1,10 +1,7 @@
 import { formatTimeToNow } from '@/lib/utils'
-// import { Post, User, Vote } from '@prisma/client'
 import { MessageSquare } from 'lucide-react'
-// import Link from 'next/link'
 import { FC, useRef } from 'react'
 import EditorOutput from './EditorOutput'
-// import PostVoteClient from './post-vote/PostVoteClient'
 import { Link } from 'react-router-dom'
 import PostVote from './PostVote'
 import { Votes } from '@/types/post'
@@ -14,20 +11,14 @@ import { Post as PostType } from '@/types/post'
 interface PostProps {
   post: PostType
   currentVote?: Votes
-  // commentAmt: number
-  // subrabbitName: string
   votesAmt: number
 }
 
-
 const Post: FC<PostProps> = ({
     post,
-    // commentAmt,
     currentVote,
-    // subrabbitName,
     votesAmt,
   }) => {
-    // console.log(post)
     const pRef = useRef<HTMLParagraphElement>(null)
       return (
         <div className='rounded-md bg-white shadow'>
@@ -78,6 +69,5 @@ const Post: FC<PostProps> = ({
         </div>
       )
   }
-
 
 export default Post

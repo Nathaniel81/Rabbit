@@ -14,24 +14,31 @@ from .models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the User model.
+
+    This serializer is used to serialize user data, including the user's ID, username, email,
+    and profile picture URL (if available).
+
+    Attributes:
+        profile_picture: Serializer method field to retrieve the URL of the user's profile picture.
+
+    """
+
     profile_picture = serializers.SerializerMethodField()
-    # load_dotenv()
 
     class Meta:
         model = User
         fields = ('id', 'username', 'email', 'profile_picture',)
 
-    # def get_profile_picture(self, obj):
-    #     if obj.profile_picture:
-    #         return f"https://res.cloudinary.com/{os.getenv('CLOUDINARY_NAME')}/{obj.profile_picture}"
-    #     return None
+    # Get the URL of the user's profile picture.
     def get_profile_picture(self, obj):
         if obj.profile_picture:
             return cloudinary_url(obj.profile_picture.public_id)[0]
 
         return None
 
-
+# Generate JWT tokens for the provided user
 def get_tokens_for_user(user):
     refresh = RefreshToken.for_user(user)
     return {
@@ -40,9 +47,25 @@ def get_tokens_for_user(user):
     }
 
 class GithubLoginSerializer(serializers.Serializer):
+    """
+    Serializer for handling GitHub login.
+
+    This serializer validates the provided GitHub code and exchanges it for an access token.
+    """
+
     code = serializers.CharField()
-    
+
     def validate_code(self, code):   
+        """
+        Validate the provided GitHub code and exchange it for an access token.
+
+        Parameters:
+            code (str): The GitHub code obtained during the OAuth process.
+
+        Returns:
+            dict: A dictionary containing user data along with access and refresh tokens.
+        """
+
         access_token = Github.exchange_code_for_token(code)
         
         if access_token:
@@ -50,6 +73,8 @@ class GithubLoginSerializer(serializers.Serializer):
             github_username = user_data['login']
             github_id = user_data['id']
             emails_data = Github.get_github_emails(access_token)
+
+             # Find the primary email address associated with the user
             primary_email = next((email for email in emails_data if email.get('primary')), None)
 
             if primary_email:

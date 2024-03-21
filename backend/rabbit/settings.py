@@ -46,7 +46,8 @@ CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_ALLOW_ALL = True
 CSRF_TRUSTED_ORIGINS = [
-    'rabbit-2ulj.onrender.com'
+    # 'rabbit-2ulj.onrender.com'
+    "http://localhost:5173/"
 ]
 # CORS_EXPOSE_HEADERS = ["Content-Type", "X-CSRFToken"]
 # SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
@@ -126,8 +127,8 @@ REDIS_URL = os.getenv('REDIS_URL')
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': REDIS_URL,
-        # 'LOCATION': 'redis://127.0.0.1:6379/1',
+        # 'LOCATION': REDIS_URL,
+        'LOCATION': 'redis://127.0.0.1:6379/1',
         'OPTIONS': {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
         }
@@ -140,8 +141,8 @@ CACHES = {
 # }
 
 SIMPLE_JWT = {
-  'ACCESS_TOKEN_LIFETIME': timedelta(minutes=700),
-  'REFRESH_TOKEN_LIFETIME': timedelta(minutes=900),
+  'ACCESS_TOKEN_LIFETIME': timedelta(seconds=30),
+  'REFRESH_TOKEN_LIFETIME': timedelta(minutes=60),
   'ROTATE_REFRESH_TOKENS': False,
   'BLACKLIST_AFTER_ROTATION': True,
   'UPDATE_LAST_LOGIN': False,

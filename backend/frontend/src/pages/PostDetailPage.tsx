@@ -6,7 +6,6 @@ import { formatTimeToNow } from '@/lib/utils';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store'
 import { useParams, Link } from 'react-router-dom';
-// import { usePrevious } from '@mantine/hooks'
 import { cn } from '@/lib/utils'
 import { ChevronLeft } from 'lucide-react'
 import PostVote from '@/components/PostVote';
@@ -40,31 +39,31 @@ const PostDetailPage = () => {
     });
 
     const votesAmt = post?.votes.reduce((acc, vote) => {
-        if (vote.type === 'UP') return acc + 1
-        if (vote.type === 'DOWN') return acc - 1
-        return acc
+      if (vote.type === 'UP') return acc + 1
+      if (vote.type === 'DOWN') return acc - 1
+      return acc
       }, 0)
 
       const currentVote = post?.votes.find(
         (vote) => vote.user === user?.user_id
       )
-    //   const prevVote = usePrevious(currentVote)
+
     if (!post) {
       return <div>Loading...</div>;
     }
 
   return (
-    <div className='sm:container max-w-7xl mx-auto h-full pt-12 mt-4'>
+    <div className='sm:container max-w-7xl mx-auto h-full py-12 my-7'>
         <Link
           to='/'
           className={cn(
             buttonVariants({ variant: 'ghost' }),
-            'self-start -mt-20'
+            'self-start -mt-22'
           )}>
           <ChevronLeft className='mr-2 h-4 w-4' />
           Home
         </Link>
-        <div className='py-4 h-full flex flex-col sm:flex-row items-center sm:items-start justify-between'>
+        <div className='h-full flex flex-col sm:flex-row align items-center sm:items-start justify-between mt-1'>
           <Suspense fallback={<PostVoteShell />}>
             <PostVote
               postId={post?.id}

@@ -1,5 +1,5 @@
 import { Icons } from '@/components/Icons';
-import SubrabbitSidebar from '@/components/SubrabbitSidebar';
+import SubrabbitActionPanel from '@/components/SubrabbitActionPanel';
 import { Avatar, AvatarFallback } from '@/components/ui/Avatar';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -14,7 +14,6 @@ import { getCsrfToken } from '@/lib/utils';
 
 
 const SubrabbitDetailPage = () => {
-
   const location = useLocation();
   const path = location.pathname;
   const navigate = useNavigate();
@@ -40,34 +39,18 @@ const SubrabbitDetailPage = () => {
     },
   });
 
-  // const postsQueryKey = ['posts'];
-  // const { data: subrabbitPosts } = useQuery({
-  //   queryKey: postsQueryKey,
-  //   queryFn: async () => {
-  //     const config = {
-  //       withCredentials: true,
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //         "x-csrftoken": getCsrfToken()
-  //       },
-  //     }
-  //     const response = await axios.get(`/api/subrabbit/${slug}/posts/`, config);
-  //     const res = await response.data
-  //     return res;
-  //   },
-  // });
 
   return (
     <div className='sm:container max-w-7xl mx-auto h-full pt-12'>
       <div>
-        {/* <ToFeedButton /> */}
-
+        {/* Main content */}
         <div className='grid grid-cols-1 md:grid-cols-3 gap-y-4 md:gap-x-4 py-6'>
+          {/* Left column */}
           <ul className='flex flex-col col-span-2 space-y-6'>
             <h1 className='font-bold text-3xl md:text-4xl h-14'>
               r/{slug ?? subrabbit?.name}
             </h1>
-
+            {/* Post input section */}
             <li className='overflow-hidden rounded-md bg-white shadow'>
               <div className='h-full px-6 py-4 flex justify-between gap-6'>
                 <div className='relative'>
@@ -107,23 +90,19 @@ const SubrabbitDetailPage = () => {
                 </Button>
               </div>
             </li>
-
             <PostFeed />
-
           </ul>
-
           <div className='overflow-hidden h-fit rounded-lg border border-gray-200 order-first md:order-last'>
             <div className='px-6 py-4'>
               <p className='font-semibold py-3'>About r/{slug}</p>
             </div>
-
-            <SubrabbitSidebar />
-
+            {/* Subrabbit action panel */}
+            <SubrabbitActionPanel />
           </div>
         </div>
       </div>
     </div>
   )
-}
+};
 
-export default SubrabbitDetailPage
+export default SubrabbitDetailPage;

@@ -12,6 +12,7 @@ import { AppDispatch } from '@/redux/store'
 import { openModal } from '@/redux/slices/modalSlice';
 import { getCsrfToken } from '@/lib/utils';
 import { Votes } from '@/types/post';
+import { logout } from '@/redux/slices/authSlice';
 
 interface CommentVotesProps {
   commentId: string
@@ -52,7 +53,35 @@ const CommentVotes: FC<CommentVotesProps> = ({
           "x-csrftoken": getCsrfToken()
         },
       }
-      await axios.patch('/api/subrabbit/post/comment/vote/', payload, config)
+      try {
+        await axios.patch('/api/subrabbit/post/comment/vote/', payload, config)
+      } catch(err) {
+        if (err instanceof AxiosError && err.response?.status === 401) {
+          try {
+            await axios.post('/api/user/refresh/', {
+              withCredentials: true,
+              headers: {
+                "Content-Type": "application/json",
+                "x-csrftoken": getCsrfToken()
+              },
+            });
+            const { data } = await axios.patch(
+              '/api/subrabbit/post/comment/vote/',
+              payload, 
+              config
+            );
+            return data as string
+          } catch (refreshErr) {
+            if (refreshErr instanceof AxiosError && (
+              refreshErr.response?.status === 401 || refreshErr.response?.status === 400)) {
+              dispatch(logout());
+              // queryClient.invalidateQueries({ queryKey: queryKey, exact: true });
+              dispatch(openModal('signin'));
+            }
+          }
+        } 
+        throw err;
+      }
     },
     onError: (err, voteType) => {
       if (voteType === 'UP') setVotesAmt((prev) => prev - 1)

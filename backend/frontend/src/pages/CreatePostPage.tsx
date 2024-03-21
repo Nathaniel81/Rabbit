@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/Button";
 import { useParams } from 'react-router-dom';
-import SubrabbitSidebar from "@/components/SubrabbitSidebar";
+import SubrabbitActionPanel from "@/components/SubrabbitActionPanel";
 import Editor from "@/components/Editor";
 
 
@@ -33,7 +33,7 @@ const CreatePostPage = () => {
       </div>
       
       <div className='overflow-hidden h-fit rounded-lg border border-gray-200 order-first md:order-last'>
-        <SubrabbitSidebar />
+        <SubrabbitActionPanel />
       </div>
 
       </div>

@@ -12,8 +12,7 @@ import { z } from 'zod';
 import { getCsrfToken } from '@/lib/utils';
 import { useQueryClient } from '@tanstack/react-query';
 import { Subrabbit } from '@/types/subrabbit';
-// import '@/styles/editor.css'
-
+import '@/Editor.css'
 
 
 type FormData = z.infer<typeof PostValidator>
@@ -39,13 +38,13 @@ const Editor = () => {
           title: '',
           content: null,
         },
-      })
+      });
 
-      const { toast } = useToast()
-      const ref = useRef<EditorJS>()
-      const _titleRef = useRef<HTMLTextAreaElement>(null)
+      const { toast } = useToast();
+      const ref = useRef<EditorJS>();
+      const _titleRef = useRef<HTMLTextAreaElement>(null);
 
-      const [isMounted, setIsMounted] = useState<boolean>(false)
+      const [isMounted, setIsMounted] = useState<boolean>(false);
 
       const { mutate: createPost } = useMutation({
         mutationFn: async ({
@@ -54,20 +53,20 @@ const Editor = () => {
           subrabbitId,
         }: PostCreationRequest) => {
           const payload: PostCreationRequest = { title, content, subrabbitId }
+          const config = {
+            withCredentials: true,
+            headers: {
+              "Content-Type": "application/json",
+              "x-csrftoken": getCsrfToken()
+            },
+          }
 
           const { data } = await axios.post(
             '/api/create-post/', 
             payload,
-            // config
-            {
-              withCredentials: true,
-              headers: {
-                "Content-Type": "application/json",
-                "x-csrftoken": getCsrfToken()
-              },
-            }
+            config
           )
-          return data
+          return data;
         },
         onError: () => {
           return toast({
@@ -87,9 +86,7 @@ const Editor = () => {
         },
       })
 
-
       const initializeEditor = useCallback(async () => {
-
         const EditorJS = (await import('@editorjs/editorjs')).default
         const Header = (await import('@editorjs/header')).default
         const Embed = (await import('@editorjs/embed')).default
@@ -136,9 +133,9 @@ const Editor = () => {
         }
       }, [])
 
-      useEffect(() => {
-          setIsMounted(true)
-      }, [])
+    useEffect(() => {
+        setIsMounted(true)
+    }, [])
 
     useEffect(() => {
         if (Object.keys(errors).length) {
@@ -177,9 +174,7 @@ const Editor = () => {
     const { ref: titleRef, ...rest } = register('title')
 
     async function onSubmit(data: FormData) {
-      console.log('Submit')
         const blocks = await ref.current?.save()
-        console.log(blocks)
     
         const payload: PostCreationRequest = {
           title: data.title,
@@ -189,48 +184,30 @@ const Editor = () => {
         createPost(payload)
       }
 
-      useEffect(() => {}, [])
-
-    //   useEffect(() => {
-    //     if (error) {
-    //       toast({
-    //         title: 'Something went wrong.',
-    //         description: 'Your post was not published. Please try again.',
-    //         variant: 'destructive',
-    //       });
-    //     } else if (success) {
-    //       toast({
-    //         description: 'Your post has been published.',
-    //       });
-          // turn pathname /r/mycommunity/submit into /r/mycommunity
-          // const newPathname = location.pathname.split('/').slice(0, -1).join('/');
-          // navigate(newPathname);
-    //     //   dispatch(resetState())
-    //     }
-    //   }, [navigate, location.pathname, toast]);
-
     return (
-    <div className='w-full p-4 bg-zinc-50 rounded-lg border border-zinc-200'>
-      <form
-        id='subrabbit-post-form'
-        className='w-fit'
-        onSubmit={handleSubmit(onSubmit)}
-        >
-          <div className='prose prose-stone dark:prose-invert'>
-          <TextareaAutosize
-            ref={(e) => {
-              titleRef(e)
-              // @ts-expect-error chill
-              _titleRef.current = e
-            }}
-            {...rest}
-            placeholder='Title'
-            className='w-full resize-none appearance-none overflow-hidden bg-transparent text-5xl font-bold focus:outline-none'
-          />
-            <div id='editor' className='min-h-[500px]' />
-          </div>
-      </form>
-    </div>
+      <div className='w-full p-4 bg-zinc-50 rounded-lg border border-zinc-200'>
+        <form
+          id='subrabbit-post-form'
+          className='w-fit'
+          onSubmit={handleSubmit(onSubmit)}
+          >
+            <div className='prose prose-stone dark:prose-invert'>
+              <TextareaAutosize
+                ref={(e) => {
+                  titleRef(e)
+                  // @ts-expect-error Ignoring TypeScript error due to manual assignment for special case handling.
+                  // This is necessary to directly manipulate the ref in a scenario not typically covered by React's ref handling.
+                  _titleRef.current = e
+                }}
+                {...rest}
+                placeholder='Title'
+                className='w-full resize-none appearance-none overflow-hidden bg-transparent text-5xl font-bold focus:outline-none'
+              />
+  
+              <div id='editor' className='min-h-[500px]' />
+            </div>
+        </form>
+      </div>
   );
 };
 

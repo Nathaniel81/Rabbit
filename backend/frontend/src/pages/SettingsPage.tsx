@@ -33,10 +33,11 @@ import {
 } from '@/redux/slices/authSlice';
 import { AppDispatch } from '@/redux/store';
 import { useDispatch } from 'react-redux';
+import { logout } from '@/redux/slices/authSlice';
+import { openModal } from '@/redux/slices/modalSlice';
 
 
 type FormData = z.infer<typeof UsernameValidator>
-
 
 export default function SettingsPage() {
   const navigate = useNavigate();
@@ -51,10 +52,10 @@ export default function SettingsPage() {
   const fileInput = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-	if (!userInfo) {
-		navigate('/')
-	}
-  },[userInfo, navigate])
+  if (!userInfo) {
+    navigate('/')
+  }
+  },[userInfo, navigate]);
 
   const {
     handleSubmit,
@@ -66,7 +67,7 @@ export default function SettingsPage() {
     defaultValues: {
       username: userInfo?.username || '',
     },
-  }) 
+  });
   
   const { mutate: updateUsername, isPending: usernamePending } = useMutation({
     mutationFn: async ({ username: username}: FormData) => {
@@ -78,8 +79,8 @@ export default function SettingsPage() {
           "x-csrftoken": getCsrfToken()
         },
       }
-      const { data } = await axios.patch(`api/user/username/`, payload, config)
-      return data
+      const { data } = await axios.patch(`api/user/username/`, payload, config);
+      return data;
     },
     onError: (err) => {
       if (err instanceof AxiosError) {
@@ -89,6 +90,16 @@ export default function SettingsPage() {
             description: 'Please choose another username.',
             variant: 'destructive',
           })
+        }
+        if (err.response?.status === 401) {
+          toast({
+            title: 'Login Required.',
+            description: 'Please login to proceed.',
+            variant: 'destructive',
+          })
+          dispatch(logout());
+          dispatch(openModal('signin'));
+          return;
         }
       }
       return toast({
@@ -154,6 +165,16 @@ export default function SettingsPage() {
             variant: 'destructive',
           })
         }
+        if (error.response?.status === 401) {
+          toast({
+            title: 'Login Required.',
+            description: 'Please login to proceed.',
+            variant: 'destructive',
+          })
+          dispatch(logout());
+          dispatch(openModal('signin'));
+          return;
+        }
       }
       return toast({
         title: 'Something went wrong.',
@@ -173,11 +194,11 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className='max-w-4xl mx-auto py-12'>
+    <div className='max-w-4xl mx-auto py-12 mt-7'>
       <div className='grid items-start gap-8'>
         <h1 className='font-bold text-3xl md:text-4xl mt-4'>Settings</h1>
-
         <div className='grid gap-10'>
+          {/* Username update form */}
           <form
             className=""
             onSubmit={handleSubmit((e) => updateUsername(e))}
@@ -214,7 +235,7 @@ export default function SettingsPage() {
               </CardFooter>
             </Card>
           </form>
-
+          {/* Profile picture update form */}
           <form
             className=""
             onSubmit={(e) => handleProfilePictureSubmit(e)}
@@ -260,6 +281,5 @@ export default function SettingsPage() {
         </div>
       </div>
     </div>
-    )
-  }
-
+  )
+}

@@ -89,18 +89,19 @@ const CreateSubrabbitPage = () => {
         <div className='flex justify-between items-center'>
           <h1 className='text-xl font-semibold'>Create a Community</h1>
         </div>
-
         <hr className='bg-red-500 h-px' />
-
+        {/* Community name input */}
         <div>
           <p className='text-lg font-medium'>Name</p>
           <p className='text-xs pb-2'>
             Community names including capitalization cannot be changed.
           </p>
           <div className='relative'>
+            {/* Prefix for community name */}
             <p className='absolute text-sm left-0 w-8 inset-y-0 grid place-items-center text-zinc-400'>
               r/
             </p>
+            {/* Input field for community name */}
             <Input
               value={input}
               onChange={(e) => setInput(e.target.value)}
@@ -108,14 +109,15 @@ const CreateSubrabbitPage = () => {
             />
           </div>
         </div>
-
         <div className='flex justify-end gap-4'>
+          {/* Cancel button */}
           <Button
             disabled={isPending}
             variant='subtle'
             onClick={() => navigate(-1)}>
             Cancel
           </Button>
+          {/* Create community button */}
           <Button
             isLoading={isPending}
             disabled={input.length === 0}
@@ -125,7 +127,7 @@ const CreateSubrabbitPage = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default CreateSubrabbitPage
+export default CreateSubrabbitPage;

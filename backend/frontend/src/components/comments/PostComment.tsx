@@ -57,13 +57,16 @@ const PostComment = ({
           "x-csrftoken": getCsrfToken()
         },
        }
-
-      const { data } = await axios.post(
-        `/api/subrabbit/post/comment/`,
-        payload,
-        config
-      )
-      return data
+       try {
+         const { data } = await axios.post(
+           `/api/subrabbit/post/comment/`,
+           payload,
+           config
+         )
+         return data
+       } catch (err) {
+        console.log(err)
+       }
     },
 
     onError: () => {
