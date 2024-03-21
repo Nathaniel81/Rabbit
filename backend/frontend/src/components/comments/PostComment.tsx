@@ -10,11 +10,10 @@ import { Textarea } from '../ui/Textarea'
 
 import { useToast } from '@/hooks/useToast'
 import { getCsrfToken } from '@/lib/utils'
-import { openModal } from '@/redux/slices/modalSlice'
-import { AppDispatch, RootState } from '@/redux/store'
+import { RootState } from '@/redux/store'
 import { Comment, Votes } from '@/types/post'
 import { useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { Icons } from '../Icons'
 import { Avatar, AvatarFallback } from '../ui/Avatar'
 import { Button } from '../ui/Button'
@@ -33,7 +32,6 @@ const PostComment = ({
   currentVote,
   postId,
 }: PostCommentProps) => {
-  const dispatch = useDispatch<AppDispatch>();
   const [input, setInput] = useState<string>('');
   const userLogin = useSelector((state: RootState) => state.userInfo);
   const { user } = userLogin;
@@ -57,16 +55,13 @@ const PostComment = ({
           "x-csrftoken": getCsrfToken()
         },
        }
-       try {
+
          const { data } = await axios.post(
            `/api/subrabbit/post/comment/`,
            payload,
            config
          )
-         return data
-       } catch (err) {
-        console.log(err)
-       }
+         return data;
     },
 
     onError: () => {
@@ -127,13 +122,7 @@ const PostComment = ({
                 currentVote={currentVote}
               />
               <Button
-                onClick={() => {
-                  if (!user) {
-                    dispatch(openModal('signin'))
-                  } else {
-                    setIsReplying(true)
-                  }
-                }}
+                onClick={() => setIsReplying(true)}
                 variant='ghost'
                 size='xs'>
                 <MessageSquare className='h-4 w-4 mr-1.5' />

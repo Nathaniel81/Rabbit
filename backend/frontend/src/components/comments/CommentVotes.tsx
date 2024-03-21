@@ -7,12 +7,13 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios, { AxiosError } from 'axios'
 import { ArrowBigDown, ArrowBigUp } from 'lucide-react'
 import { FC, useState } from 'react'
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch } from '@/redux/store'
 import { openModal } from '@/redux/slices/modalSlice';
 import { getCsrfToken } from '@/lib/utils';
 import { Votes } from '@/types/post';
 import { logout } from '@/redux/slices/authSlice';
+import { RootState } from '@/redux/rootReducer';
 
 interface CommentVotesProps {
   commentId: string
@@ -37,6 +38,8 @@ const CommentVotes: FC<CommentVotesProps> = ({
   const [currentVote, setCurrentVote] = useState(_currentVote)
   const prevVote = usePrevious(currentVote)
   const { toast } = useToast();
+  const userLogin = useSelector((state: RootState) => state.userInfo);
+  const { user } = userLogin;
   const queryClient = useQueryClient();
   const queryKey = ['postDetail'];
 
@@ -75,7 +78,7 @@ const CommentVotes: FC<CommentVotesProps> = ({
             if (refreshErr instanceof AxiosError && (
               refreshErr.response?.status === 401 || refreshErr.response?.status === 400)) {
               dispatch(logout());
-              // queryClient.invalidateQueries({ queryKey: queryKey, exact: true });
+              queryClient.invalidateQueries({ queryKey: queryKey, exact: true });
               dispatch(openModal('signin'));
             }
           }
@@ -93,11 +96,11 @@ const CommentVotes: FC<CommentVotesProps> = ({
       if (err instanceof AxiosError) {
         if (err.response?.status === 401) {
           dispatch(openModal('signin'))
-        return toast({
-            title: 'Unauthorized',
-            description: 'Please Login.',
-            variant: 'destructive',
-          });
+          return toast({
+              title: 'Unauthorized',
+              description: 'Please Login.',
+              variant: 'destructive',
+            });
         }
       }
 
@@ -131,7 +134,17 @@ const CommentVotes: FC<CommentVotesProps> = ({
     <div className='flex gap-1'>
       {/* upvote */}
       <Button
-        onClick={() => vote(VoteType.UP)}
+        onClick={() => {
+          if (!user) {
+              dispatch(openModal('signin'));
+              return toast({
+                title: 'Login Required',
+                description: 'Please login or create an account.',
+                variant: 'destructive',
+              });
+          }
+          return vote(VoteType.UP)
+        }}
         size='xs'
         variant='ghost'
         aria-label='upvote'>
@@ -149,7 +162,17 @@ const CommentVotes: FC<CommentVotesProps> = ({
 
       {/* downvote */}
       <Button
-        onClick={() => vote(VoteType.DOWN)}
+        onClick={() => {
+          if (!user) {
+              dispatch(openModal('signin'));
+              return toast({
+                title: 'Login Required',
+                description: 'Please login or create an account.',
+                variant: 'destructive',
+              });
+          }
+          return vote(VoteType.DOWN)
+        }}
         size='xs'
         className={cn({
           'text-emerald-500': currentVote?.type === 'DOWN',

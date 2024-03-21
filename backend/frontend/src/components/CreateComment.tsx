@@ -2,11 +2,8 @@ import { Button } from '@/components/ui/Button'
 import { useToast } from '@/hooks/useToast'
 import { getCsrfToken } from '@/lib/utils'
 import { CommentRequest } from '@/lib/validators/comment'
-import { openModal } from '@/redux/slices/modalSlice'
-import { AppDispatch } from '@/redux/store'
 import axios, { AxiosError } from 'axios'
 import { FC, useState } from 'react'
-import { useDispatch } from 'react-redux'
 import { Label } from './ui/Label'
 import { Textarea } from './ui/Textarea'
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -21,7 +18,6 @@ const CreateComment: FC<CreateCommentProps> = ({ postId, replyToId }) => {
   const queryKey = ['postDetail'];
 
   const { toast } = useToast();
-  const dispatch = useDispatch<AppDispatch>();
   const [input, setInput] = useState<string>('');
 
   const { mutate: comment, isPending } = useMutation({
@@ -46,7 +42,6 @@ const CreateComment: FC<CreateCommentProps> = ({ postId, replyToId }) => {
     onError: (err) => {
       if (err instanceof AxiosError) {
         if (err.response?.status === 401) {
-          dispatch(openModal('signin'))
           return toast({
               title: 'Unauthorized',
               description: 'Please Login.',

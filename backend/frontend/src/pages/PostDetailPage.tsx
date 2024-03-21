@@ -21,8 +21,8 @@ const PostDetailPage = () => {
     const userLogin = useSelector((state: RootState) => state.userInfo);
     const { user } = userLogin;
 
-    const queryKey = ['postDetail'];
-    const { data: post } = useQuery<Post>({
+    const queryKey = ['postDetail', id];
+    const { data: post, isPending } = useQuery<Post>({
       queryKey: queryKey,
       queryFn: async () => {
         const config = {
@@ -48,12 +48,13 @@ const PostDetailPage = () => {
         (vote) => vote.user === user?.user_id
       )
 
-    if (!post) {
+    if (!post || isPending) {
       return <div>Loading...</div>;
     }
-
+  
   return (
     <div className='sm:container max-w-7xl mx-auto h-full py-12 my-7'>
+      <div className='py-5'>
         <Link
           to='/'
           className={cn(
@@ -63,6 +64,7 @@ const PostDetailPage = () => {
           <ChevronLeft className='mr-2 h-4 w-4' />
           Home
         </Link>
+      </div>
         <div className='h-full flex flex-col sm:flex-row align items-center sm:items-start justify-between mt-1'>
           <Suspense fallback={<PostVoteShell />}>
             <PostVote

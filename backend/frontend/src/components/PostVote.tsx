@@ -85,7 +85,7 @@ const PostVote = ({
             if (refreshErr instanceof AxiosError && (
               refreshErr.response?.status === 401 || refreshErr.response?.status === 400)) {
               dispatch(logout());
-              // queryClient.invalidateQueries({ queryKey: queryKey, exact: true });
+              queryClient.invalidateQueries({ queryKey: queryKey, exact: true });
               dispatch(openModal('signin'));
             }
           }
@@ -134,8 +134,8 @@ const PostVote = ({
   })
 
   return (
-    <div className='flex md:flex-col sm:flex-row gap-4 sm:gap-0 pr-6 sm:w-20 sm:mt-10 md:mt-0 pb-4 sm:pb-0'>
-      {/* upvote */}
+    <div className='flex md:flex-col gap-4 flex-row sm:gap-0 pr-6 sm:w-20 pb-4 sm:pb-0'>
+    {/* upvote */}
       <Button
         onClick={() => {
           if (!user) {
