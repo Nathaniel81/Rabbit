@@ -40,7 +40,7 @@ DEBUG = True
 #   "http://localhost:5173",  
 # ]
 
-ALLOWED_HOSTS = ['https://rabbit-2ulj.onrender.com']
+ALLOWED_HOSTS = ['rabbit-2ulj.onrender.com']
 
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
