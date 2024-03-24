@@ -24,7 +24,7 @@ const PostFeed = () => {
   const { ref, entry } = useIntersection({
     root: lastPostRef.current,
     threshold: 1,
-  })
+  });
 
   const config = {
     withCredentials: true,
@@ -32,7 +32,7 @@ const PostFeed = () => {
       "Content-Type": "application/json",
       "x-csrftoken": getCsrfToken()
     },
-  }
+  };
 
   const { 
     data, 
@@ -43,14 +43,14 @@ const PostFeed = () => {
     queryFn: async ({ pageParam = 1 }) => {
         const query =
             `/api/posts?limit=${INFINITE_SCROLL_PAGINATION_RESULTS}&page=${pageParam}` +
-            (subrabbitName ? `&subrabbitName=${subrabbitName}` : '')
+            (subrabbitName ? `&subrabbitName=${subrabbitName}` : '');
 
-        const { data } = await axios.get(query, config)
-        return data
+        const { data } = await axios.get(query, config);
+        return data;
     },
     initialPageParam: 1,
     getNextPageParam: (_, pages) => {
-        return pages.length + 1
+        return pages.length + 1;
     },
     // initialData: { pages: [initialPosts], pageParams: [1] },
 });
