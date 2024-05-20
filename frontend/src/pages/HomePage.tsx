@@ -12,7 +12,6 @@ import { Home as HomeIcon } from 'lucide-react';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import Loader from '@/components/Loader';
 
 
 const HomePage = () => {
@@ -42,7 +41,7 @@ const HomePage = () => {
   }, []);
 
   const queryKey = ['communities'];
-  const { data, isPending } = useQuery<Subrabbit[]>({
+  const { data } = useQuery<Subrabbit[]>({
     queryKey,
     queryFn: async () => {
       const config = {
@@ -57,8 +56,6 @@ const HomePage = () => {
       return res;
     },
   });
-
-  if (isPending) return <Loader />
 
   return (
     <div className='sm:container max-w-7xl mx-auto h-full pt-12 mt-6'>
