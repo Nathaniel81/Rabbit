@@ -36,10 +36,6 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 DEBUG = True
 
 
-# CORS_ALLOWED_ORIGINS = [
-#   "http://localhost:5173",  
-# ]
-
 ALLOWED_HOSTS = ['rabbit-2ulj.onrender.com']
 
 CORS_ALLOW_ALL_ORIGINS = True
@@ -47,7 +43,6 @@ CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_ALLOW_ALL = True
 CSRF_TRUSTED_ORIGINS = [
     'https://rabbit-2ulj.onrender.com'
-    # "http://localhost:5173/"
 ]
 # CORS_EXPOSE_HEADERS = ["Content-Type", "X-CSRFToken"]
 # SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
@@ -69,7 +64,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_editorjs_fields',
     'corsheaders',
-    # 'cloudinary_storage',
     'cloudinary',
 
     'accounts',
@@ -141,8 +135,8 @@ CACHES = {
 # }
 
 SIMPLE_JWT = {
-  'ACCESS_TOKEN_LIFETIME': timedelta(seconds=3000),
-  'REFRESH_TOKEN_LIFETIME': timedelta(minutes=6000),
+  'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
+  'REFRESH_TOKEN_LIFETIME': timedelta(days=2),
   'ROTATE_REFRESH_TOKENS': False,
   'BLACKLIST_AFTER_ROTATION': True,
   'UPDATE_LAST_LOGIN': False,
@@ -189,18 +183,16 @@ AUTH_USER_MODEL = 'accounts.User'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
-
-# database_url = os.getenv('DATABASE_URL')
-
 # DATABASES = {
-#     'default': dj_database_url.parse(database_url)
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
 # }
+
+DATABASES = {
+    'default': dj_database_url.config(default=os.getenv('DATABASE_URL'))
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators

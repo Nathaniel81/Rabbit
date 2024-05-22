@@ -85,7 +85,11 @@ class GithubLoginSerializer(serializers.Serializer):
                 user.email = email
                 user.save()
             except User.DoesNotExist:
-                user = User.objects.create_user(username=user_data['login'], email=email, github_id=github_id)
+                user = User.objects.create_user(
+                    username=user_data['login'].lower(), 
+                    email=email, 
+                    github_id=github_id
+                )
 
             serialized_user = UserSerializer(user).data
 
