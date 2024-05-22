@@ -6,7 +6,7 @@ Rabbit is a personal project that I developed to deepen my understanding of full
 
 ## Technology Stack
 
-- **Frontend**: React with TypeScript, Tailwind CSS, ShadcnUI
+- **Frontend**: React with TypeScript, Tailwind CSS, & ShadcnUI
 - **Backend**: Django
 - **Database**: PostgreSQL
 
