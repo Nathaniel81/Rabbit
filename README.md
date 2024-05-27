@@ -1,7 +1,6 @@
-![Django CI/CD](https://github.com/Nathaniel81/Rabbit/actions/workflows/django.yml/badge.svg)
-
-
 # Rabbit: A Social Media Platform Inspired by Reddit
+
+![Django CI/CD](https://github.com/Nathaniel81/Rabbit/actions/workflows/django.yml/badge.svg)
 
 ## Introduction
 
