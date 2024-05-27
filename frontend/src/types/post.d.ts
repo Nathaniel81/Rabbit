@@ -9,6 +9,7 @@ type VoteType = 'UP' | 'DOWN';
 
 type Author = {
     username: string;
+    profile_picture: string;
 }
 
 type Comment = {

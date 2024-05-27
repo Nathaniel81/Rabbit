@@ -1,5 +1,5 @@
 import { SubscribeToSubrabbitPayload } from '@/lib/validators/subrabbit';
-import { openModal } from "@/redux/slices/modalSlice";
+import { openModal } from '@/redux/state';
 import { Dispatch } from "@reduxjs/toolkit";
 import axios, { AxiosError } from 'axios';
 import { clsx, type ClassValue } from "clsx";

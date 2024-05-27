@@ -3,12 +3,15 @@ import App from './App.tsx'
 import './index.css'
 import { Toaster } from './components/ui/Toaster.tsx'
 import { Provider } from 'react-redux';
-import store from './redux/store'
+import { PersistGate } from 'redux-persist/integration/react';
+import { store, persistor } from './redux/store.ts';
 
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <Provider store={store}>
     <Toaster />
-      <App />
+      <PersistGate loading={null} persistor={persistor}>
+        <App />
+      </PersistGate>
   </Provider>
 )

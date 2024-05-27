@@ -8,6 +8,7 @@ import CreatePostPage from './pages/CreatePostPage';
 import PostDetailPage from './pages/PostDetailPage';
 import SettingsPage from './pages/SettingsPage';
 import Navbar from './components/Navbar';
+import AuthenticationModal from './components/AuthenticationModal';
 
 const queryClient = new QueryClient();
 
@@ -15,6 +16,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
         <Router>
+            <AuthenticationModal />
             <Navbar />
             <Routes>
               <Route path="/" element={<HomePage />} />
