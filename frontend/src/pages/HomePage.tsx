@@ -10,6 +10,7 @@ import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import Loader from '@/components/Loader';
+import { useToast } from '@/hooks/useToast'
 import { closeModal } from '@/redux/state';
 
 
@@ -18,19 +19,24 @@ const HomePage = () => {
   const dispatch = useDispatch();
   const code = searchparams.get('code');
   const navigate = useNavigate();
+  const { toast } = useToast();
 
-  const loginWithGithub = (async (code: string) => {
-      try {
-        const resp = await axios.post('/api/user/auth/github/', { code });
-        const result = resp.data;
-        console.log(result);
-        dispatch(setLogin(result));
-        navigate('/');
-      } catch (error) {
-        console.log(error)
-      }
+  const loginWithGithub = async (code: string) => {
+    try {
+      const resp = await axios.post('/api/user/auth/github/', { code });
+      const result = resp.data;
+      console.log(result);
+      dispatch(setLogin(result));
+      navigate('/');
+    } catch (error) {
+      toast({
+        title: 'Something went wrong',
+        variant: 'destructive',
+      });
+      console.log(error);
     }
-  );
+  };
+  
   
   useEffect(() => {
     if (code) {
@@ -40,15 +46,15 @@ const HomePage = () => {
     //eslint-disable-next-line
   }, [code]);
 
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const code = urlParams.get('code');
+  // useEffect(() => {
+  //   const urlParams = new URLSearchParams(window.location.search);
+  //   const code = urlParams.get('code');
 
-    if (code) {
-      // If code is present in the URL, redirect to the same URL with hash
-      window.location.href = window.location.origin + '/#' + window.location.pathname + window.location.search;
-    }
-  }, []);
+  //   if (code) {
+  //     // If code is present in the URL, redirect to the same URL with hash
+  //     window.location.href = window.location.origin + '/#' + window.location.pathname + window.location.search;
+  //   }
+  // }, []);
 
   const queryKey = ['communities'];
   const { data, isPending } = useQuery<Subrabbit[]>({
