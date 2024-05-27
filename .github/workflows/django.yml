@@ -35,14 +35,29 @@ jobs:
     needs: [build]
     steps:
       - uses: actions/checkout@v3
-      - name: Test
+
+      # Backend Tests and Deployment
+      - name: Test Backend
         run: |
           cd backend
-          echo "Running tests..."
-      - name: Deploy
-        # Only run this step if the branch is main
+          echo "Running backend tests..."
+      
+      - name: Deploy Backend
         if: github.ref == 'refs/heads/main'
         env:
-          deploy_url: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+          deploy_url: ${{ secrets.BACKEND_RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          curl "$deploy_url"
+      
+      # Frontend Tests and Deployment
+      - name: Test Frontend
+        run: |
+          cd frontend
+          echo "Running frontend tests..."
+
+      - name: Deploy Frontend
+        if: github.ref == 'refs/heads/main'
+        env:
+          deploy_url: ${{ secrets.FRONTEND_RENDER_DEPLOY_HOOK_URL }}
         run: |
           curl "$deploy_url"
