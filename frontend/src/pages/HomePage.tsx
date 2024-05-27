@@ -27,7 +27,6 @@ const HomePage = () => {
       const result = resp.data;
       console.log(result);
       dispatch(setLogin(result));
-      navigate('/');
     } catch (error) {
       toast({
         title: 'Something went wrong',
@@ -35,6 +34,7 @@ const HomePage = () => {
       });
       console.log(error);
     }
+    navigate('/');
   };
   
   
