@@ -2,11 +2,11 @@
 
 ## Introduction
 
-Rabbit is a personal project that I developed to deepen my understanding of full-stack development. It's a social media platform, inspired by Reddit, where users can join rooms, create posts, and engage in discussions.
+Rabbit is a personal project developed to deepen my full-stack skills, inspired by Reddit, where users can join rooms, create posts, and engage in discussions. Built with React, TailwindCSS, Shadcn/ui, Django, and PostgreSQL, it features Redux Toolkit for state management, React Query for data fetching, GitHub OAuth for authentication, EditorJS for rich text creation, infinite scroll, BeautifulSoup for scraping link data, Cloudinary for image hosting, and Redis caching for higher vote differences on posts/comments.
 
 ## Technology Stack
 
-- **Frontend**: React with TypeScript, Tailwind CSS, ShadcnUI
+- **Frontend**: React with TypeScript, Tailwind CSS, & Shadcn/ui
 - **Backend**: Django
 - **Database**: PostgreSQL
 
@@ -30,4 +30,5 @@ I welcome any questions or suggestions. Your feedback is greatly appreciated!
 
 ## **Live Demo**
 
+Explore the live version of this project on [rabbit-2ulj.onrender.com](https://rabbit-2ulj.onrender.com).
 
