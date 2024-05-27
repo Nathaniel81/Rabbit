@@ -1,5 +1,5 @@
 import { useSelector } from 'react-redux';
-import { RootState } from '@/redux/rootReducer';
+import { RootState } from '@/redux/store';
 import { Post } from '@/types/post'
 import PostComment from './comments/PostComment';
 import CreateComment from './CreateComment';
