@@ -5,43 +5,23 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/DropdownMenu';
-import { useToast } from '@/hooks/useToast';
-import { openModal } from '@/redux/slices/modalSlice';
-import { AppDispatch, RootState } from '@/redux/store';
+import { RootState } from '@/redux/store';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Icons } from './Icons';
+import SearchBar from './SearchBar';
 import { Avatar, AvatarFallback } from './ui/Avatar';
 import { buttonVariants } from './ui/Button';
-import SearchBar from './SearchBar';
-import { logout } from '@/redux/slices/authSlice';
+import { logout, openModal } from '@/redux/state';
+import { AppDispatch } from '@/redux/store';
 
 
 const Navbar = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const navigate = useNavigate();
-  const userLogin = useSelector((state: RootState) => state.userInfo);
-  const { user } = userLogin;
-  const { toast } = useToast();
+  const user = useSelector((state: RootState) => state.user);
 
   const signIn = () => {
     dispatch(openModal('signin'));
-  };
-
-  const logoutHandler = () => {
-    dispatch(logout())
-      .unwrap()
-      .then(() => {
-        navigate('/');
-      })
-      .catch((error) => {
-        console.error('Logout failed:', error);
-        toast({
-          title: "Logout Failed",
-          description: "There was a problem logging out. Please try again later.",
-          variant: 'destructive',
-        });
-      });
   };
 
   return (
@@ -102,17 +82,18 @@ const Navbar = () => {
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                  <span onClick={logoutHandler}>
+                  <Link 
+                    to="/"
+                    onClick={() => dispatch(logout())}>
                     Logout
-                  </span>
+                  </Link>
             </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </>
         ) : (
-          <div className={`${buttonVariants()} cursor-pointer`}
-          onClick={signIn}>
-            Sign In
+          <div className={`${buttonVariants()} cursor-pointer flex items-center`} onClick={signIn}>
+           <p className='whitespace-nowrap'>Sign In</p>
           </div>
         )}
         </div>

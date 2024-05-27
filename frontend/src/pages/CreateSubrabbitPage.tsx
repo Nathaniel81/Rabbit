@@ -6,7 +6,7 @@ import { useMutation } from '@tanstack/react-query'
 import axios, { AxiosError } from 'axios'
 import { useState } from 'react'
 import {  AppDispatch } from '@/redux/store'
-import { openModal } from '@/redux/slices/modalSlice';
+import { openModal } from '@/redux/state'
 
 import { useNavigate } from 'react-router-dom'
 import { useDispatch} from 'react-redux'
@@ -41,12 +41,12 @@ const CreateSubrabbitPage = () => {
       const { data } = await axios.post('/api/subrabbits/', payload, config )
       return data as string
     },
-    /* eslint-disable-next-line */
+    //eslint-disable-next-line
     onError: (err: any) => {
       if (err instanceof AxiosError) {
         if (err.response?.status === 409) {
           return toast({
-            title: 'Subreddit already exists.',
+            title: 'Subrabbit already exists.',
             description: 'Please choose a different name.',
             variant: 'destructive',
           })
@@ -54,7 +54,7 @@ const CreateSubrabbitPage = () => {
 
         if (err.response?.status === 422) {
           return toast({
-            title: 'Invalid subreddit name.',
+            title: 'Invalid subrabbit name.',
             description: 'Please choose a name between 3 and 21 letters.',
             variant: 'destructive',
           })
@@ -120,7 +120,7 @@ const CreateSubrabbitPage = () => {
           {/* Create community button */}
           <Button
             isLoading={isPending}
-            disabled={input.length === 0}
+            disabled={input.length === 0 || isPending}
             onClick={() => createCommunity()}>
             Create Community
           </Button>

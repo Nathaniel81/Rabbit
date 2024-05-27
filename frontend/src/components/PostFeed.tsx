@@ -10,11 +10,11 @@ import axios from 'axios'
 import { useParams } from 'react-router-dom'
 import { Votes } from '@/types/post'
 import { getCsrfToken } from '@/lib/utils'
+import Loader from './Loader'
 
 
 const PostFeed = () => {
-  const userLogin = useSelector((state: RootState) => state.userInfo);
-  const { user } = userLogin;
+  const user = useSelector((state: RootState) => state.user);
   const INFINITE_SCROLL_PAGINATION_RESULTS = 3;
   const { slug } = useParams();
 
@@ -37,9 +37,10 @@ const PostFeed = () => {
   const { 
     data, 
     fetchNextPage, 
-    isFetchingNextPage 
-} = useInfiniteQuery({
-    queryKey: ['infinite-query', slug],
+    isFetchingNextPage,
+    isPending
+  } = useInfiniteQuery({
+    queryKey: [`infinite-query ${slug}`],
     queryFn: async ({ pageParam = 1 }) => {
         const query =
             `/api/posts?limit=${INFINITE_SCROLL_PAGINATION_RESULTS}&page=${pageParam}` +
@@ -53,18 +54,21 @@ const PostFeed = () => {
         return pages.length + 1;
     },
     // initialData: { pages: [initialPosts], pageParams: [1] },
-});
+  });
 
-const posts = data?.pages.flatMap((page) => page);
-useEffect(() => {
-  if (entry?.isIntersecting && posts && posts[posts?.length - 1]?.next) {
-    fetchNextPage(); // Load more posts when the last post comes into view
-  }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-}, [entry, fetchNextPage]);
+  const posts = data?.pages.flatMap((page) => page);
+  useEffect(() => {
+    if (entry?.isIntersecting && posts && posts[posts?.length - 1]?.next) {
+      fetchNextPage(); // Load more posts when the last post comes into view
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [entry, fetchNextPage]);
 
 
   return (
+    isPending ? (
+      <Loader />
+    ) : (
     <ul className='flex flex-col col-span-2 space-y-6'>
       {posts?.map((postItem, postIndex) => postItem?.results?.map((post: PostType, index: number) => {
         const votesAmt = post.votes.reduce((acc: number, vote: Votes) => {
@@ -104,6 +108,7 @@ useEffect(() => {
         </li>
       )}
     </ul>
+    )
   );
 };           
 

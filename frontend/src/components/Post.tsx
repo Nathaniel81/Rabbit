@@ -1,6 +1,6 @@
 import { formatTimeToNow } from '@/lib/utils'
 import { MessageSquare } from 'lucide-react'
-import { FC, useRef } from 'react'
+import { FC, useRef, useEffect, useState } from 'react'
 import EditorOutput from './EditorOutput'
 import { Link } from 'react-router-dom'
 import PostVote from './PostVote'
@@ -20,6 +20,24 @@ const Post: FC<PostProps> = ({
     votesAmt,
   }) => {
     const pRef = useRef<HTMLParagraphElement>(null)
+
+    const [isHeight160, setIsHeight160] = useState(false);
+
+    useEffect(() => {
+      const checkHeight = () => {
+        if (pRef.current) {
+          setIsHeight160(pRef.current.clientHeight === 160);
+        }
+      };
+  
+      // Use setTimeout to ensure the DOM is fully painted before measuring
+      const timeoutId = setTimeout(checkHeight, 550);
+  
+      return () => {
+        clearTimeout(timeoutId);
+      };
+    }, []);
+
       return (
         <div className='rounded-md bg-white shadow'>
             <div className='px-6 py-4 flex justify-between'>
@@ -30,7 +48,7 @@ const Post: FC<PostProps> = ({
                 />
                 <div className='w-0 flex-1'>
                   <div className='max-h-40 mt-1 text-xs text-gray-500'>
-                    {post?.subrabbit.name ? (
+                    {post?.subrabbit?.name ? (
                       <>
                         <Link
                           className='underline text-zinc-900 text-sm underline-offset-2'
@@ -40,26 +58,25 @@ const Post: FC<PostProps> = ({
                         <span className='px-1'>•</span>
                       </>
                     ) : null}
-                    <span>Posted by u/{post.author.username}</span>{' '}
+                    <span>Posted by u/{post?.author?.username}</span>{' '}
                     {formatTimeToNow(new Date(post.created_at))}
                   </div>
-                    <Link to={`/r/${post?.subrabbit.name}/post/${post.id}`}>
+                    <Link to={`/r/${post?.subrabbit?.name}/post/${post.id}`}>
                       <h1 className='text-lg font-semibold py-2 leading-6 text-gray-900'>
                         {post.title || post.id}
                       </h1>
                     </Link>
-                    <div className='relative text-sm max-h-40 w-full overflow-clip' ref={pRef}> 
-                      <EditorOutput content={post.content} />
-                      {pRef.current?.clientHeight === 160 ? (
-                        <div className='absolute bottom-0 left-0 h-24 w-full bg-gradient-to-t from-white to-transparent'>
-                        </div>
-                      ) : null}
-                    </div>
+                    <div className='relative text-sm max-h-40 w-full overflow-clip' ref={pRef}>
+            <EditorOutput content={post.content} />
+            {isHeight160 && (
+              <div className='absolute bottom-0 left-0 h-24 w-full bg-gradient-to-t from-white to-transparent'></div>
+            )}
+          </div>
                 </div>
             </div>
             <div className='bg-gray-50 z-20 text-sm px-4 py-4 sm:px-6'>
               <Link
-                to={`/r/${post?.subrabbit.name}/post/${post.id}`}
+                to={`/r/${post?.subrabbit?.name}/post/${post?.id}`}
                 className='w-fit flex items-center gap-2'>
                 <MessageSquare className='h-4 w-4' />
                 {post?.comments.filter((comment) => !comment.parent_comment).length}

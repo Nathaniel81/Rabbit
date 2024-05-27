@@ -1,4 +1,3 @@
-import { Icons } from '@/components/Icons';
 import { useOnClickOutside } from '@/hooks/use-on-click-outside';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
@@ -78,7 +77,7 @@ const SearchBar = () => {
                   }}
                     key={index}
                     className='flex justify-between items-center p-2 cursor-pointer hover:bg-gray-100'>
-                    {<Icons.users className='h-4 w-4 mr-2' />}
+                    <img src="/team.png" alt="" />
                     <div className='text-sm'>
                       r/{subrabbit.name}
                     </div>

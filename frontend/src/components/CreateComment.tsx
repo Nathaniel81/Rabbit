@@ -7,6 +7,9 @@ import { FC, useState } from 'react'
 import { Label } from './ui/Label'
 import { Textarea } from './ui/Textarea'
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { openModal } from '@/redux/state'
+import { useDispatch } from 'react-redux'
+import { AppDispatch } from '@/redux/store'
 
 interface CreateCommentProps {
   postId: string
@@ -14,8 +17,9 @@ interface CreateCommentProps {
 }
 
 const CreateComment: FC<CreateCommentProps> = ({ postId, replyToId }) => {
+  const dispatch = useDispatch<AppDispatch>();
   const queryClient = useQueryClient();
-  const queryKey = ['postDetail'];
+  const queryKey = [`postDetail ${postId}`];
 
   const { toast } = useToast();
   const [input, setInput] = useState<string>('');
@@ -32,20 +36,18 @@ const CreateComment: FC<CreateCommentProps> = ({ postId, replyToId }) => {
       }
 
       const { data } = await axios.post(
-        `/api/subrabbit/post/comment/`,
-        payload,
-        config
-      )
+        `/api/subrabbit/post/comment/`, payload, config)
       return data
     },
 
     onError: (err) => {
       if (err instanceof AxiosError) {
         if (err.response?.status === 401) {
+          dispatch(openModal('signin'));
           return toast({
-              title: 'Unauthorized',
-              description: 'Please Login.',
-              variant: 'destructive',
+            title: 'Login Required',
+            description: 'Please login or create an account.',
+            variant: 'destructive',
           });
         }
       }
@@ -57,8 +59,8 @@ const CreateComment: FC<CreateCommentProps> = ({ postId, replyToId }) => {
       })
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKey, exact: true })
       setInput('')
+      queryClient.invalidateQueries({ queryKey: queryKey, exact: true })
     },
   })
 
@@ -77,7 +79,7 @@ const CreateComment: FC<CreateCommentProps> = ({ postId, replyToId }) => {
         <div className='mt-2 flex justify-end'>
           <Button
             isLoading={isPending}
-            disabled={input.length === 0}
+            disabled={input.length === 0 || isPending}
             onClick={() => comment({ postId, content: input, replyToId })}>
             Post
           </Button>

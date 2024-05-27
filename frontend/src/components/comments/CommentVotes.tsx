@@ -8,12 +8,10 @@ import axios, { AxiosError } from 'axios'
 import { ArrowBigDown, ArrowBigUp } from 'lucide-react'
 import { FC, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch } from '@/redux/store'
-import { openModal } from '@/redux/slices/modalSlice';
 import { getCsrfToken } from '@/lib/utils';
 import { Votes } from '@/types/post';
-import { logout } from '@/redux/slices/authSlice';
-import { RootState } from '@/redux/rootReducer';
+import { openModal, logout } from '@/redux/state';
+import { AppDispatch, RootState } from '@/redux/store';
 
 interface CommentVotesProps {
   commentId: string
@@ -38,8 +36,7 @@ const CommentVotes: FC<CommentVotesProps> = ({
   const [currentVote, setCurrentVote] = useState(_currentVote)
   const prevVote = usePrevious(currentVote)
   const { toast } = useToast();
-  const userLogin = useSelector((state: RootState) => state.userInfo);
-  const { user } = userLogin;
+  const user = useSelector((state: RootState) => state.user);
   const queryClient = useQueryClient();
   const queryKey = ['postDetail'];
 
@@ -164,12 +161,12 @@ const CommentVotes: FC<CommentVotesProps> = ({
       <Button
         onClick={() => {
           if (!user) {
-              dispatch(openModal('signin'));
-              return toast({
-                title: 'Login Required',
-                description: 'Please login or create an account.',
-                variant: 'destructive',
-              });
+            dispatch(openModal('signin'));
+            return toast({
+              title: 'Login Required',
+              description: 'Please login or create an account.',
+              variant: 'destructive',
+            });
           }
           return vote(VoteType.DOWN)
         }}

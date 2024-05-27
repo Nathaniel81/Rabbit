@@ -1,31 +1,35 @@
+import '@/Editor.css';
 import { useToast } from '@/hooks/useToast';
+import { getCsrfToken } from '@/lib/utils';
 import { PostCreationRequest, PostValidator } from '@/lib/validators/post';
+import { openModal } from '@/redux/state';
+import { Subrabbit } from '@/types/subrabbit';
 import EditorJS from '@editorjs/editorjs';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation } from '@tanstack/react-query';
-import axios from 'axios';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import axios, { AxiosError } from 'axios'
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useLocation, useNavigate } from 'react-router-dom';
 import TextareaAutosize from 'react-textarea-autosize';
 import { z } from 'zod';
-import { getCsrfToken } from '@/lib/utils';
-import { useQueryClient } from '@tanstack/react-query';
-import { Subrabbit } from '@/types/subrabbit';
-import '@/Editor.css'
-
+import { useDispatch } from 'react-redux';
 
 type FormData = z.infer<typeof PostValidator>
 
 
 const Editor = () => {
+    const location = useLocation();
+    const pathname = location.pathname;
+    const dispatch = useDispatch();
+  
+    const parts = pathname.split('/');
     const queryClient = useQueryClient();
-    const queryKey = ['subrabbitDetail'];
+    const queryKey = [`subrabbitDetail ${parts[2]}`];
     const data = queryClient.getQueryData(queryKey) as Subrabbit;
     const subrabbitId = data?.id;
 
     const navigate = useNavigate();
-    const location = useLocation();
 
     const {
         register,
@@ -68,10 +72,23 @@ const Editor = () => {
           )
           return data;
         },
-        onError: () => {
-          return toast({
-            title: 'Something went wrong.',
-            description: 'Your post was not published. Please try again.',
+        //eslint-disable-next-line
+        onError: (err: any) => {
+          if (err instanceof AxiosError) {
+            if (err.response?.status === 401) {
+              dispatch(openModal("signin"))
+              toast({
+                title: 'Log In Required.',
+                description: 'Please log in or sign up to create a community.',
+                variant: 'destructive',
+              })
+              return;
+            }
+          }
+    
+          toast({
+            title: 'There was an error.',
+            description: err.message,
             variant: 'destructive',
           })
         },
@@ -79,6 +96,7 @@ const Editor = () => {
           // turn pathname /r/mycommunity/submit into /r/mycommunity
           const newPathname = location.pathname.split('/').slice(0, -1).join('/');
           navigate(newPathname);
+          queryClient.invalidateQueries({ queryKey: queryKey});
 
           return toast({
             description: 'Your post has been published.',
@@ -142,6 +160,7 @@ const Editor = () => {
           
           for (const [_key, value] of Object.entries(errors)) {
             console.log(_key, value)
+            console.log(Object.entries(errors))
             value
             toast({
               title: 'Something went wrong.',

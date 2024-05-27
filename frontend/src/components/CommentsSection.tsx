@@ -5,9 +5,8 @@ import PostComment from './comments/PostComment';
 import CreateComment from './CreateComment';
 
 
-const CommentsSection = ({ post }: { post: Post }) => {
-    const userLogin = useSelector((state: RootState) => state.userInfo);
-    const { user } = userLogin;
+const CommentsSection = ({ post }: { post?: Post }) => {
+    const user = useSelector((state: RootState) => state.user);
 
     return (
         <div className='flex flex-col gap-y-4 mt-4'>

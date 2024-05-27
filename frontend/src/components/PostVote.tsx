@@ -9,13 +9,10 @@ import { ArrowBigDown, ArrowBigUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { VoteType } from '@/types/post';
 import { getCsrfToken } from '@/lib/utils';
-import { openModal } from '@/redux/slices/modalSlice';
-import { AppDispatch } from '@/redux/store';
 import { useDispatch, useSelector } from 'react-redux';
 import { useQueryClient } from '@tanstack/react-query';
-import { RootState } from '@/redux/rootReducer';
-import { logout } from '@/redux/slices/authSlice';
-
+import { logout, openModal } from '@/redux/state';
+import { RootState, AppDispatch } from '@/redux/store';
 
 interface PostVoteProps {
   postId: string | null | undefined;
@@ -38,8 +35,7 @@ const PostVote = ({
   const queryClient = useQueryClient();
   const queryKey = ['posts'];
 
-  const userLogin = useSelector((state: RootState) => state.userInfo);
-  const { user } = userLogin;
+  const user = useSelector((state: RootState) => state.user);
 
 
   useEffect(() => {

@@ -10,14 +10,13 @@ import { Textarea } from '../ui/Textarea'
 
 import { useToast } from '@/hooks/useToast'
 import { getCsrfToken } from '@/lib/utils'
-import { RootState } from '@/redux/store'
 import { Comment, Votes } from '@/types/post'
-import { useEffect } from 'react'
-import { useSelector } from 'react-redux'
+// import { useEffect } from 'react'
 import { Icons } from '../Icons'
 import { Avatar, AvatarFallback } from '../ui/Avatar'
 import { Button } from '../ui/Button'
 import CommentVotes from './CommentVotes'
+
 
 interface PostCommentProps {
     comment: Comment
@@ -33,8 +32,6 @@ const PostComment = ({
   postId,
 }: PostCommentProps) => {
   const [input, setInput] = useState<string>('');
-  const userLogin = useSelector((state: RootState) => state.userInfo);
-  const { user } = userLogin;
   const [isReplying, setIsReplying] = useState<boolean>(false);
   const commentRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
@@ -55,13 +52,9 @@ const PostComment = ({
           "x-csrftoken": getCsrfToken()
         },
        }
-
-         const { data } = await axios.post(
-           `/api/subrabbit/post/comment/`,
-           payload,
-           config
-         )
-         return data;
+      const { data } = await axios.post(
+        `/api/subrabbit/post/comment/`, payload, config)
+      return data;
     },
 
     onError: () => {
@@ -78,20 +71,20 @@ const PostComment = ({
       },
   })
 
-  useEffect(() => {
-    if (isReplying && comment.parent_comment) {
-      setInput(`@${comment.parent_comment.author.username} `);
-    }
-  }, [isReplying, comment.parent_comment]);
+  // useEffect(() => {
+  //   if (isReplying && comment.parent_comment) {
+  //     setInput(`@${comment.author.username} `);
+  //   }
+  // }, [isReplying, comment.parent_comment, comment.author.username]);
 
   return (
     <div ref={commentRef} className='flex flex-col'>
       <div className='flex items-center'>
           <Avatar>
-              {user?.profile_picture ? (
+              {comment?.author.profile_picture ? (
                 <div className='relative aspect-square h-full w-full'>
                   <img
-                    src={user?.profile_picture}
+                    src={comment?.author.profile_picture}
                     alt='profile picture'
                     referrerPolicy='no-referrer'
                     className='h-full object-cover'
@@ -99,7 +92,7 @@ const PostComment = ({
                 </div>
               ) : (
                 <AvatarFallback>
-                  <span className='sr-only'>{user?.username}</span>
+                  <span className='sr-only'>{comment?.author?.username}</span>
                   <Icons.user className='h-4 w-4' />
                 </AvatarFallback>
               )}

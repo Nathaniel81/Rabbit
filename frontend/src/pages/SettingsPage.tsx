@@ -10,9 +10,7 @@ import {
 import { useToast } from '@/hooks/useToast';
 import { getCsrfToken } from '@/lib/utils';
 import { UsernameValidator } from '@/lib/validators/username';
-import { RootState } from '@/redux/rootReducer';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation } from '@tanstack/react-query';
 import axios, { AxiosError } from 'axios';
 import React, { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -24,17 +22,16 @@ import { Avatar } from "@/components/ui/Avatar";
 import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/Label";
 
-import { Loader2 } from 'lucide-react';
 import { useSelector } from 'react-redux';
 
-import {
-  updateProfilePicture as updateProfilePictureInState,
-  updateUsername as updateUsernameInState
-} from '@/redux/slices/authSlice';
-import { AppDispatch } from '@/redux/store';
+import { 
+  logout, 
+  openModal, 
+  updateProfilePicture, 
+  updateUsername 
+} from '@/redux/state';
+import { AppDispatch, RootState } from '@/redux/store';
 import { useDispatch } from 'react-redux';
-import { logout } from '@/redux/slices/authSlice';
-import { openModal } from '@/redux/slices/modalSlice';
 
 
 type FormData = z.infer<typeof UsernameValidator>
@@ -43,17 +40,17 @@ export default function SettingsPage() {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
   const { toast } = useToast();
-  const userLogin = useSelector((state: RootState) => state.userInfo);
-  const { user: userInfo } = userLogin;
+  const userInfo = useSelector((state: RootState) => state.user);
   const [profilePictureUrl, setProfilePictureUrl] = useState(userInfo?.profile_picture || '');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [nameLoading, setNameLoading] = useState(false);
   const [isNameChanged, setIsNameChanged] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
   if (!userInfo) {
-    navigate('/')
+    navigate('/');
   }
   },[userInfo, navigate]);
 
@@ -68,53 +65,6 @@ export default function SettingsPage() {
       username: userInfo?.username || '',
     },
   });
-  
-  const { mutate: updateUsername, isPending: usernamePending } = useMutation({
-    mutationFn: async ({ username: username}: FormData) => {
-      const payload: FormData = { username }
-      const config = {
-        withCredentials: true,
-        headers: {
-          "Content-Type": "application/json",
-          "x-csrftoken": getCsrfToken()
-        },
-      }
-      const { data } = await axios.patch(`api/user/username/`, payload, config);
-      return data;
-    },
-    onError: (err) => {
-      if (err instanceof AxiosError) {
-        if (err.response?.status === 409) {
-          return toast({
-            title: 'Username already taken.',
-            description: 'Please choose another username.',
-            variant: 'destructive',
-          })
-        }
-        if (err.response?.status === 401) {
-          toast({
-            title: 'Login Required.',
-            description: 'Please login to proceed.',
-            variant: 'destructive',
-          })
-          dispatch(logout());
-          dispatch(openModal('signin'));
-          return;
-        }
-      }
-      return toast({
-        title: 'Something went wrong.',
-        description: 'Your username was not updated. Please try again.',
-        variant: 'destructive',
-      })
-    },
-    onSuccess: (data) => {
-      toast({
-        description: 'Your username has been updated.',
-      })
-      dispatch(updateUsernameInState(data.username));
-    },
-  })
 
   const handleClick = () => {
     fileInput?.current?.click();
@@ -149,17 +99,15 @@ export default function SettingsPage() {
         },
       }
       const { data } = await axios.patch(`api/user/profile-picture/`, formData, config)
-      setIsLoading(false);
-      dispatch(updateProfilePictureInState(data.profile_picture));
+      dispatch(updateProfilePicture(data.profile_picture));
       setSelectedFile(null);
       toast({
         description: 'Your profile picture has been updated.',
       })
     } catch (error) {
-      setIsLoading(false);
       if (error instanceof AxiosError) {
         if (error.response?.status === 409) {
-          return toast({
+          toast({
             title: 'Username already taken.',
             description: 'Please choose another username.',
             variant: 'destructive',
@@ -176,22 +124,71 @@ export default function SettingsPage() {
           return;
         }
       }
-      return toast({
+      toast({
         title: 'Something went wrong.',
         description: 'Your profile picture was not updated. Please try again.',
         variant: 'destructive',
       })
     }
+    setIsLoading(false);
   }
+
+  const handleUsernameSubmit = handleSubmit(async (values) => {
+    setNameLoading(true);
+    try {
+      const config = {
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          "x-csrftoken": getCsrfToken()
+        },
+      }
+      const { data } = await axios.patch(`api/user/username/`, values, config)
+      dispatch(updateUsername(data.username));
+      toast({
+        description: 'Your username has been updated.',
+      })
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        if (error.response?.status === 409) {
+          toast({
+            title: 'Username already taken.',
+            description: 'Please choose another username.',
+            variant: 'destructive',
+          })
+        }
+        if (error.response?.status === 401) {
+          toast({
+            title: 'Login Required.',
+            description: 'Please login to proceed.',
+            variant: 'destructive',
+          })
+          // dispatch(logout());
+          dispatch(openModal('signin'));
+          return;
+        }
+      }
+      toast({
+        title: 'Something went wrong.',
+        description: 'Your username was not updated. Please try again.',
+        variant: 'destructive',
+      })
+    }
+    setNameLoading(false);
+  })
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files && files.length > 0) {
-      setSelectedFile(files[0]);
+      const file = files[0];
+      setSelectedFile(file);
+      const newImgURL = URL.createObjectURL(file);
+      setProfilePictureUrl(newImgURL);
     } else {
       setSelectedFile(null);
     }
-  }
+  };
+  
 
   return (
     <div className='max-w-4xl mx-auto py-12 mt-7'>
@@ -200,9 +197,7 @@ export default function SettingsPage() {
         <div className='grid gap-10'>
           {/* Username update form */}
           <form
-            className=""
-            onSubmit={handleSubmit((e) => updateUsername(e))}
-            >
+            onSubmit={handleSubmit(() => handleUsernameSubmit())}>
             <Card>
               <CardHeader>
                 <CardTitle>Your username</CardTitle>
@@ -231,7 +226,11 @@ export default function SettingsPage() {
                   </div>
                 </CardContent>
               <CardFooter>
-                <Button isLoading={usernamePending} disabled={!isNameChanged}>Change name</Button>
+                <Button 
+                  isLoading={nameLoading} 
+                  disabled={!isNameChanged || nameLoading}>
+                    Change name
+                </Button>
               </CardFooter>
             </Card>
           </form>
@@ -257,9 +256,7 @@ export default function SettingsPage() {
                   />
                   <Avatar className='h-8 w-8 cursor-pointer' onClick={handleClick}>
                     <div className='relative aspect-square h-full w-full'>
-                      {isLoading ? (
-                        <Loader2 className='h-5 w-5 animate-spin text-zinc-500' />
-                      ) : profilePictureUrl ? (
+                      {profilePictureUrl ? (
                         <img
                           src={profilePictureUrl}
                           alt='profile picture'
@@ -274,7 +271,11 @@ export default function SettingsPage() {
                 </div>
               </CardContent>
               <CardFooter>
-                <Button isLoading={isLoading} disabled={!selectedFile}>Change profile picture</Button>
+                <Button 
+                  isLoading={isLoading} 
+                  disabled={!selectedFile || isLoading}>
+                    Change profile picture
+                </Button>
               </CardFooter>
             </Card>
           </form>

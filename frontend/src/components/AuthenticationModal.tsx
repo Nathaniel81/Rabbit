@@ -1,19 +1,17 @@
-import { Button } from '@/components/ui/Button';
 import { Icons } from '@/components/Icons';
+import { Button } from '@/components/ui/Button';
 import { cn } from '@/lib/utils';
+import { closeModal, openModal } from '@/redux/state';
+import { RootState } from '@/redux/store';
+import { useClickOutside } from '@mantine/hooks';
 import { X } from 'lucide-react';
 import { FC } from 'react';
-import { useSelector } from 'react-redux';
-import { openModal, closeModal } from '@/redux/slices/modalSlice';
-import { useDispatch } from 'react-redux';
-import { RootState } from '@/redux/rootReducer';
-import { useClickOutside } from '@mantine/hooks';
+import { useDispatch, useSelector } from 'react-redux';
 
 
 const AuthenticationModal: FC = () => {
   const isLoading = false;
-  const modalState = useSelector((state: RootState) => state.modal);
-  const { isOpen, modalType } = modalState;
+  const modal = useSelector((state: RootState) => state.modal);
   const dispatch = useDispatch();
 
   const ref = useClickOutside(() => {
@@ -32,7 +30,7 @@ const AuthenticationModal: FC = () => {
       window.location.assign(`https://github.com/login/oauth/authorize/?client_id=5dcc33b0caf89cf4435d&scope=user:email`);
   };
 
-  if (!isOpen) {
+  if (!modal.isOpen) {
       return null;
   }
 
@@ -51,7 +49,7 @@ const AuthenticationModal: FC = () => {
             <div className='flex flex-col space-y-2 text-center'>
               <Icons.logo className='mx-auto h-10 w-10' />
               {/* Display different title based on modal type */}
-              {modalType === 'signin' ? (
+              {modal.modalType === 'signin' ? (
                 <h1 className='text-2xl font-semibold tracking-tight'>Welcome back</h1>
               ) : (
                 <h1 className='text-2xl font-semibold tracking-tight'>Sign Up</h1>
@@ -76,7 +74,7 @@ const AuthenticationModal: FC = () => {
               </Button>
             </div>
             {/* Sign up or sign in prompt */}
-            {modalType === 'signin' ? (
+            {modal.modalType === 'signin' ? (
               <p className='px-8 text-center text-sm text-muted-foreground'>
                 New to Rabbit?{' '}
                 <span

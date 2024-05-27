@@ -19,10 +19,9 @@ const SubrabbitDetailPage = () => {
   const navigate = useNavigate();
   const { slug } = useParams();
 
-  const userLogin = useSelector((state: RootState) => state.userInfo);
-  const { user } = userLogin;
+  const user = useSelector((state: RootState) => state.user);
 
-  const queryKey = ['subrabbitDetail'];
+  const queryKey = [`subrabbitDetail ${slug}`];
   const { data: subrabbit } = useQuery({
     queryKey: queryKey,
     queryFn: async () => {
@@ -54,23 +53,23 @@ const SubrabbitDetailPage = () => {
             <li className='overflow-hidden rounded-md bg-white shadow'>
               <div className='h-full px-6 py-4 flex justify-between gap-6'>
                 <div className='relative'>
-                      <Avatar>
-                        {user?.profile_picture ? (
-                          <div className='relative aspect-square h-full w-full'>
-                            <img
-                              src={user?.profile_picture}
-                              alt='profile picture'
-                              referrerPolicy='no-referrer'
-                              className='h-full object-cover'
-                            />
-                          </div>
-                        ) : (
-                          <AvatarFallback>
-                            <span className='sr-only'>{user?.username}</span>
-                            <Icons.user className='h-4 w-4' />
-                          </AvatarFallback>
-                        )}
-                      </Avatar>
+                  <Avatar>
+                    {user?.profile_picture ? (
+                      <div className='relative aspect-square h-full w-full'>
+                        <img
+                          src={user?.profile_picture}
+                          alt='profile picture'
+                          referrerPolicy='no-referrer'
+                          className='h-full object-cover'
+                        />
+                      </div>
+                    ) : (
+                      <AvatarFallback>
+                        <span className='sr-only'>{user?.username}</span>
+                        <Icons.user className='h-4 w-4' />
+                      </AvatarFallback>
+                    )}
+                  </Avatar>
                   <span className='absolute bottom-0 right-0 rounded-full w-3 h-3 bg-green-500 outline outline-2 outline-white' />
                 </div>
                 <Input

@@ -1,34 +1,44 @@
-import AuthenticationModal from '@/components/AuthenticationModal';
 import PostFeed from '@/components/PostFeed';
 import { buttonVariants } from '@/components/ui/Button';
 import { getCsrfToken } from '@/lib/utils';
-import { RootState } from '@/redux/rootReducer';
-import { loginWithGithub } from '@/redux/slices/authSlice';
-import { AppDispatch } from '@/redux/store';
+import { setLogin } from '@/redux/state';
 import { Subrabbit } from '@/types/subrabbit';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { Home as HomeIcon } from 'lucide-react';
 import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import Loader from '@/components/Loader';
+import { closeModal } from '@/redux/state';
 
 
 const HomePage = () => {
   const [searchparams] = useSearchParams();
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useDispatch();
   const code = searchparams.get('code');
   const navigate = useNavigate();
 
-  const modalState = useSelector((state: RootState) => state.modal);
-  const { isOpen } = modalState;
+  const loginWithGithub = (async (code: string) => {
+      try {
+        const resp = await axios.post('/api/user/auth/github/', { code });
+        const result = resp.data;
+        console.log(result);
+        dispatch(setLogin(result));
+        navigate('/');
+      } catch (error) {
+        console.log(error)
+      }
+    }
+  );
   
   useEffect(() => {
     if (code) {
-      dispatch(loginWithGithub(code));
-      navigate('/');
+      dispatch(closeModal());
+      loginWithGithub(code);
     }
-  }, [code, dispatch, navigate]);
+    //eslint-disable-next-line
+  }, [code]);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -41,7 +51,7 @@ const HomePage = () => {
   }, []);
 
   const queryKey = ['communities'];
-  const { data } = useQuery<Subrabbit[]>({
+  const { data, isPending } = useQuery<Subrabbit[]>({
     queryKey,
     queryFn: async () => {
       const config = {
@@ -59,10 +69,7 @@ const HomePage = () => {
 
   return (
     <div className='sm:container max-w-7xl mx-auto h-full pt-12 mt-6'>
-      <div>
-        {isOpen && <AuthenticationModal />}
-      </div>
-      <h1 className='font-bold text-3xl md:text-4xl'>Your feed</h1>
+      <h1 className='font-bold text-3xl md:text-4xl my-3'>Your feed</h1>
       <div className='grid grid-cols-1 md:grid-cols-3 gap-y-4 md:gap-x-4 py-6'>
         <PostFeed />
         {/* subrabbit info */}
@@ -92,21 +99,25 @@ const HomePage = () => {
             </dl>
           </div>
           {/* List of popular communities */}
-          <div className="w-full h-fit border flex-col gap-2 rounded-xl py-3 px-2 bg-secondary hidden lg:flex mt-5">
+          <div className="w-full h-fit border flex-col gap-2 rounded-xl py-3 px-2 bg-secondary hidden md:flex mt-5">
             <p className="px-3 font-semibold">Popular Communities</p>
-              <div className="flex flex-col gap-3">
-              {data?.map((subrabbit, index) => (
-                <Link 
-                to={`r/${subrabbit.name}`}
-                key={index} 
-                className="group flex gap-3 rounded-full px-3 py-1.5 cursor-pointer transition-transform duration-300 hover:bg-gray-100 hover:scale-105 hover:translate-x-1">
-                  <div className="flex flex-col gap-1">
-                    <p className="text-sm text-gray-600">{subrabbit?.name}</p>
-                    <p className="text-xs text-gray-400">{subrabbit?.members_count} members</p>
-                  </div>
-                </Link>
-              ))}
+            {isPending ? (
+              <Loader />
+                ) : (
+              <div className="flex flex-col gap-3p-3">
+                {data?.map((subrabbit, index) => (
+                  <Link 
+                  to={`r/${subrabbit.name}`}
+                  key={index} 
+                  className="group flex gap-3 rounded-full px-3 py-1.5 cursor-pointer transition-transform duration-300 hover:scale-105 hover:translate-x-1">
+                    <div className="flex flex-col gap-1">
+                      <p className="text-sm text-gray-600">{subrabbit?.name}</p>
+                      <p className="text-xs text-gray-400">{subrabbit?.members_count} members</p>
+                    </div>
+                  </Link>
+                ))}
               </div>
+            )}
           </div>
         </div>
       </div>

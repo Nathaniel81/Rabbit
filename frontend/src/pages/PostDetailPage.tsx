@@ -14,14 +14,21 @@ import { getCsrfToken } from '@/lib/utils';
 import axios from 'axios';
 import { Post } from '@/types/post'
 import CommentsSection from '@/components/CommentsSection';
+import { useEffect } from 'react';
 
+const Loader = () => {
+  return (
+    <div className="flex items-center h-screen w-full justify-center mx-auto">
+      <Loader2 className='h-15 w-15 animate-spin text-zinc-500' />
+    </div>
+  )
+}
 
 const PostDetailPage = () => {
     const { id } = useParams();
-    const userLogin = useSelector((state: RootState) => state.userInfo);
-    const { user } = userLogin;
+    const user = useSelector((state: RootState) => state.user);
 
-    const queryKey = ['postDetail', id];
+    const queryKey = [`postDetail ${id}`];
     const { data: post, isPending } = useQuery<Post>({
       queryKey: queryKey,
       queryFn: async () => {
@@ -48,24 +55,30 @@ const PostDetailPage = () => {
         (vote) => vote.user === user?.user_id
       )
 
-    if (!post || isPending) {
-      return <div>Loading...</div>;
-    }
+      useEffect(() => {
+        window.scrollTo(0, 0);
+      }, []);
+
   
   return (
     <div className='sm:container max-w-7xl mx-auto h-full py-12 my-7'>
-      <div className='py-5'>
-        <Link
-          to='/'
-          className={cn(
-            buttonVariants({ variant: 'ghost' }),
-            'self-start -mt-22'
-          )}>
-          <ChevronLeft className='mr-2 h-4 w-4' />
-          Home
-        </Link>
-      </div>
-        <div className='h-full flex flex-col sm:flex-row align items-center sm:items-start justify-between mt-1'>
+        {isPending ? (
+          <Loader />
+        ): (
+        <>
+          <div className='py-2'>
+            <Link
+              to='/'
+              className={cn(
+                buttonVariants({ variant: 'ghost' }),
+                'self-start -mt-22'
+              )}>
+              <ChevronLeft className='mr-2 h-4 w-4' />
+              Home
+            </Link>
+          </div>
+          <div className='h-full flex flex-col sm:flex-row align items-center sm:items-start justify-between mt-1'>
+        <div className='hidden md:block'>
           <Suspense fallback={<PostVoteShell />}>
             <PostVote
               postId={post?.id}
@@ -73,7 +86,7 @@ const PostDetailPage = () => {
               initialVote={currentVote?.type}
             />
           </Suspense>
-
+        </div>
         <div className='sm:w-0 w-full flex-1 bg-white p-4 rounded-sm'>
          <p className='max-h-40 mt-1 truncate text-xs text-gray-500'>
            Posted by u/{post?.author.username }{' '}
@@ -82,8 +95,17 @@ const PostDetailPage = () => {
          <h1 className='text-xl font-semibold py-2 leading-6 text-gray-900'>
            {post?.title}
          </h1>
-     
+      
          <EditorOutput content={post?.content} />
+         <div className='md:hidden'>
+          <Suspense fallback={<PostVoteShell />}>
+            <PostVote
+              postId={post?.id}
+              initialVotesAmt={votesAmt}
+              initialVote={currentVote?.type}
+            />
+          </Suspense>
+        </div>
          <Suspense
            fallback={
              <Loader2 className='h-5 w-5 animate-spin text-zinc-500' />
@@ -91,8 +113,10 @@ const PostDetailPage = () => {
            <CommentsSection post={post} />
          </Suspense>
         </div>
+          </div>
+        </>
+      )}
       </div>
-    </div>
   );
 };
 

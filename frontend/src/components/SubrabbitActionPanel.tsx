@@ -5,25 +5,29 @@ import {
   SubrabbitSubscriptionValidator,
   SubscribeToSubrabbitPayload
 } from '@/lib/validators/subrabbit';
-import { AppDispatch, RootState } from '@/redux/store';
+import { RootState } from '@/redux/store';
 import { SubrabbitData } from '@/types/subrabbit';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { format } from 'date-fns';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { openModal } from '@/redux/state';
 
 
 const SubrabbitActionPanel = () => {
-  const userLogin = useSelector((state: RootState) => state.userInfo);
-  const { user } = userLogin;
+  const user = useSelector((state: RootState) => state.user);
   const navigate = useNavigate();
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useDispatch();
   const { toast } = useToast();
   const location = useLocation();
   const path = location.pathname;
+  const pathname = location.pathname
+
+  const parts = pathname.split('/');
   const queryClient = useQueryClient();
-  const queryKey = ['subrabbitDetail'];
+  const queryKey = [`subrabbitDetail ${parts[2]}`];
+
   const subrabbit = queryClient.getQueryData<SubrabbitData>(queryKey);
   
   const { mutate: subscribe, isPending: isSubLoading } = useMutation({
@@ -154,21 +158,32 @@ const SubrabbitActionPanel = () => {
             <Button
               className='w-full mt-1 mb-4'
               isLoading={isSubLoading}
-              onClick={() => subscribe()}
-            >
+              onClick={() => {
+                if (!user) {
+                  toast({
+                    title: 'Login Required',
+                    description: 'Please login or create an account.',
+                    variant: 'destructive',
+                  });
+                  return dispatch(openModal('signin'));
+                }
+                subscribe();
+              }}>
               Join to post
             </Button>
           )
         ) : null}
         {/* Create Post button */}
-        <div
-          className={buttonVariants({
-            variant: 'outline',
-            className: 'w-full mb-6 cursor-pointer',
-          })}
-          onClick={()=> navigate(path + `/submit`)}>
-          Create Post
-        </div>
+        {subrabbit?.isSubscriber && 
+          <div
+            className={buttonVariants({
+              variant: 'outline',
+              className: 'w-full mb-6 cursor-pointer',
+            })}
+            onClick={()=> navigate(path + `/submit`)}>
+            Create Post
+          </div>
+        }
     </dl>
   )
 };
