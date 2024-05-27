@@ -8,13 +8,8 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      '/api': 'http://127.0.0.1:8000',
-      '/media': 'http://127.0.0.1:8000',
-      // '/image': 'http://127.0.0.1:8000',
-        '/image/': {
-          target: 'http://res.cloudinary.com/dpzvkmwpb',
-          changeOrigin: true,
-        },
+      // '/api': 'http://127.0.0.1:8000',
+      '/api': 'https://rabbitapi.onrender.com',
     },
   },
   resolve: {

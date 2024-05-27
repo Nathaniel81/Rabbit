@@ -36,15 +36,16 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 DEBUG = True
 
 
-# ALLOWED_HOSTS = ['rabbit-2ulj.onrender.com']
 ALLOWED_HOSTS = ['*']
 
 CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOWED_ORIGINS = [
+    "https://rabbit-23mo.onrender.com"
+]
 CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_ALLOW_ALL = True
 CSRF_TRUSTED_ORIGINS = [
-    # 'https://rabbit-2ulj.onrender.com',
-    'http://localhost:5173'
+    'https://rabbit-23mo.onrender.com',
 ]
 # CORS_EXPOSE_HEADERS = ["Content-Type", "X-CSRFToken"]
 # SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
@@ -123,8 +124,8 @@ REDIS_URL = os.getenv('REDIS_URL')
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
-        # 'LOCATION': REDIS_URL,
-        'LOCATION': 'redis://127.0.0.1:6379/1',
+        'LOCATION': REDIS_URL,
+        # 'LOCATION': 'redis://127.0.0.1:6379/1',
         'OPTIONS': {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
         }
