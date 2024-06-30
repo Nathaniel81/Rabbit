@@ -12,6 +12,7 @@ urlpatterns = [
     path('create-post/', post_views.CreatePostView.as_view(), name='create-post'),
     path('subrabbit/post/vote/', post_views.VoteView.as_view(), name='post-vote'),
     path('posts/', post_views.PostListView.as_view(), name='posts'),
+    path('posts/<int:post_id>/comments/', post_views.CommentListView.as_view(), name='post-comments'),
     path('post-detail/<str:pk>/', post_views.PostDetailView.as_view(), name='post-detail'),
     path('subrabbit/post/comment/', post_views.CreateComment.as_view(), name='create-comment'),
     path('subrabbit/post/comment/vote/', post_views.CommentVoteView.as_view(), name='comment-vote'),
@@ -19,4 +20,6 @@ urlpatterns = [
     path('link/', editorjs_views.fetch_url_metadata, name='link'),
     path('upload-image/', editorjs_views.upload_image, name='image-upload'),
     path('upload-file/', editorjs_views.upload_file, name='file-upload'),
+
+
 ]

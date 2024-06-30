@@ -15,6 +15,7 @@ import axios from 'axios';
 import { Post } from '@/types/post'
 import CommentsSection from '@/components/CommentsSection';
 import { useEffect } from 'react';
+import { Comment } from '@/types/post';
 
 const Loader = () => {
   return (
@@ -28,9 +29,9 @@ const PostDetailPage = () => {
     const { id } = useParams();
     const user = useSelector((state: RootState) => state.user);
 
-    const queryKey = [`postDetail ${id}`];
+    const detailQueryKey = [`postDetail ${id}`];
     const { data: post, isPending } = useQuery<Post>({
-      queryKey: queryKey,
+      queryKey: detailQueryKey,
       queryFn: async () => {
         const config = {
           withCredentials: true,
@@ -40,6 +41,23 @@ const PostDetailPage = () => {
           },
         }
         const response = await axios.get(`/api/post-detail/${id}/`, config);
+        const res = await response.data
+        return res;
+      },
+    });
+
+    const commentQueryKey = [`postComments ${id}`];
+    const { data: comments } = useQuery<Comment[]>({
+      queryKey: commentQueryKey,
+      queryFn: async () => {
+        const config = {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "application/json",
+            "x-csrftoken": getCsrfToken()
+          },
+        }
+        const response = await axios.get(`/api/posts/${id}/comments/`, config);
         const res = await response.data
         return res;
       },
@@ -110,7 +128,7 @@ const PostDetailPage = () => {
            fallback={
              <Loader2 className='h-5 w-5 animate-spin text-zinc-500' />
            }>
-           <CommentsSection post={post} />
+           <CommentsSection comments={comments} />
          </Suspense>
         </div>
           </div>

@@ -15,7 +15,7 @@ import Loader from './Loader'
 
 const PostFeed = () => {
   const user = useSelector((state: RootState) => state.user);
-  const INFINITE_SCROLL_PAGINATION_RESULTS = 3;
+  // const INFINITE_SCROLL_PAGINATION_RESULTS = 3;
   const { slug } = useParams();
 
   const subrabbitName = slug || '';
@@ -43,7 +43,7 @@ const PostFeed = () => {
     queryKey: [`infinite-query ${slug}`],
     queryFn: async ({ pageParam = 1 }) => {
         const query =
-            `/api/posts?limit=${INFINITE_SCROLL_PAGINATION_RESULTS}&page=${pageParam}` +
+            `/api/posts?&page=${pageParam}` +
             (subrabbitName ? `&subrabbitName=${subrabbitName}` : '');
 
         const { data } = await axios.get(query, config);

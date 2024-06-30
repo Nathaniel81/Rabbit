@@ -110,7 +110,7 @@ const PostComment = ({
         </p>
           <div className='flex gap-2 items-center'>
               <CommentVotes
-                commentId={comment.id}
+                commentId={comment.id ?? ''}
                 votesAmt={votesAmt}
                 currentVote={currentVote}
               />
@@ -156,7 +156,7 @@ const PostComment = ({
                           postComment({
                             postId: postId || '',
                             content: input,
-                            replyToId: comment.parent_comment?.id ?? comment.id,
+                            replyToId: comment.parent_comment_id ?? comment.id,
                           })
                         }}>
                         Post

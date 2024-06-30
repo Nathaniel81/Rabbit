@@ -9,6 +9,7 @@ from core.models import Subrabbit
 from core.permissions import IsAuthenticatedOrReadOnly
 from core.serializers import SubrabbitSerializer, SubrabbitSerializer_detailed
 
+from django.db.utils import IntegrityError
 
 class SubrabbitListCreateView(generics.ListCreateAPIView):
     """
@@ -23,47 +24,46 @@ class SubrabbitListCreateView(generics.ListCreateAPIView):
 
     permission_classes = [IsAuthenticatedOrReadOnly]
     authentication_classes = [CustomAuthentication]
-    queryset = Subrabbit.objects.annotate(num_members=Count('subscribers')) \
-                             .order_by('-num_members', '-created_at')[:5]
 
-    # Dynamically select serializer based on HTTP method
+    def get_queryset(self):
+        return Subrabbit.objects.annotate(num_members=Count('subscribers')) \
+                                .select_related('creator') \
+                                .prefetch_related('subscribers', 'moderators') \
+                                .order_by('-num_members', '-created_at')
+
     def get_serializer_class(self):
         if self.request.method == 'GET':
             return SubrabbitSerializer_detailed
         elif self.request.method == 'POST':
             return SubrabbitSerializer
 
-    # Override perform_create to add additional fields
     def perform_create(self, serializer):
-        serializer.save(
-            creator=self.request.user,
-            subscribers=[self.request.user],
-            moderators=[self.request.user]
-        )
+        try:
+            serializer.save(
+                creator=self.request.user,
+                subscribers=[self.request.user],
+                moderators=[self.request.user]
+            )
+        except ValidationError as e:
+            raise ValidationError(e.message_dict)
 
-    # Override create to handle validation errors
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
-
         try:
             serializer.is_valid(raise_exception=True)
             self.perform_create(serializer)
-
         except ValidationError as e:
             return self.handle_validation_error(e)
-
+        except IntegrityError as e:
+            return self.handle_integrity_error(e)
         except Exception as e:
             return Response({"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data['name'], status=status.HTTP_201_CREATED, headers=headers)
-    
-    # Method to handle validation errors
+
     def handle_validation_error(self, e):
-        # Check if the error detail contains information about a unique constraint violation
         if 'unique' in e.detail['name'][0].code:
-           # Extract the unique constraint violation key and check if it matches
-           # the error code indicating a unique constraint violation
             error_message = {
                 "title": "A subrabbit with this name already exists.", 
                 "detail": "Please choose a different subrabbit name"
@@ -73,6 +73,10 @@ class SubrabbitListCreateView(generics.ListCreateAPIView):
             return Response(e.detail, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
         else:
             return Response(e.detail, status=status.HTTP_400_BAD_REQUEST)
+
+    def handle_integrity_error(self, e):
+        return Response({"detail": "Database integrity error: " + str(e)}, status=status.HTTP_409_CONFLICT)
+
 
 class SubrabbitDetail(generics.RetrieveUpdateDestroyAPIView):
     """
@@ -86,7 +90,9 @@ class SubrabbitDetail(generics.RetrieveUpdateDestroyAPIView):
 
     permission_classes = [IsAuthenticatedOrReadOnly]
     authentication_classes = [CustomAuthentication]
-    queryset = Subrabbit.objects.all()
+    queryset = Subrabbit.objects.select_related('creator') \
+                                .prefetch_related('subscribers', 'moderators') \
+                                .all()
     lookup_field = 'name'
 
     # Return the appropriate serializer class based on the HTTP method of the request.

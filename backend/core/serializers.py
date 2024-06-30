@@ -30,19 +30,6 @@ class SubrabbitSerializer(serializers.ModelSerializer):
         model = Subrabbit
         exclude = ('rules', 'description', )
 
-class ParentCommentSerializer(serializers.ModelSerializer):
-    """
-    Serializer for parent comment objects.
-
-    This serializer serializes parent comment objects, converting them into JSON format.
-    """
-
-    comment_votes = VoteSerializer(many=True, read_only=True)
-    author = UserSerializer(read_only=True)
-    class Meta:
-        model = Comment
-        fields = '__all__'
-
 class CommentSerializer(serializers.ModelSerializer):
     """
     Serializer for comment objects.
@@ -52,14 +39,6 @@ class CommentSerializer(serializers.ModelSerializer):
 
     comment_votes = VoteSerializer(many=True, read_only=True)
     author = UserSerializer(read_only=True)
-
-    # Serializer for parent comment (if exists)
-    parent_comment = ParentCommentSerializer(read_only=True)
-
-     # Field to store the ID of the parent comment (write only)
-    parent_comment_id = serializers.PrimaryKeyRelatedField(
-        source='parent_comment', queryset=Comment.objects.all(), 
-        allow_null=True, required=False, write_only=True)
 
     class Meta:
         model = Comment
@@ -74,28 +53,29 @@ class PostSerializer(serializers.ModelSerializer):
 
     content = serializers.JSONField(read_only=True)
     author = UserSerializer(read_only=True)
-    comments = serializers.SerializerMethodField()
+    comments_count = serializers.SerializerMethodField()
     votes = VoteSerializer(many=True, read_only=True)
-    subrabbit = SubrabbitSerializer(read_only=True)
+    # subrabbit = SubrabbitSerializer(read_only=True)
+
     class Meta:
         model = Post
-        fields = '__all__'
+        fields = [
+            'id',
+            'title',
+            'content', 
+            'author', 
+            'comments_count', 
+            'votes', 
+            'subrabbit', 
+            'created_at'
+        ]
 
-    def get_comments(self, obj):
+    def get_comments_count(self, obj):
         """
-        Method to retrieve and serialize comments related to the post.
-
-        This method retrieves comments associated with the given post object,
-        annotates them with upvotes, downvotes, and net votes, and then serializes
-        them using the CommentSerializer, ordered by net votes and creation date.
+        Method to get the number of comments.
         """
 
-        comments = Comment.objects.filter(parent_post=obj).annotate(
-            upvotes=Count('comment_votes', filter=Q(comment_votes__type=VoteType.UP)),
-            downvotes=Count('comment_votes', filter=Q(comment_votes__type=VoteType.DOWN))
-        ).annotate(net_votes=F('upvotes') - F('downvotes'))
-        return CommentSerializer(comments.order_by('-net_votes', '-created_at'), 
-                                                    many=True, read_only=True).data
+        return Comment.objects.filter(parent_post=obj).count()
 
 class SubrabbitSerializer_detailed(serializers.ModelSerializer):
     """

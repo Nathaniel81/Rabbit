@@ -59,7 +59,7 @@ const Post: FC<PostProps> = ({
                       </>
                     ) : null}
                     <span>Posted by u/{post?.author?.username}</span>{' '}
-                    {formatTimeToNow(new Date(post.created_at))}
+                    {formatTimeToNow(new Date(post?.created_at))}
                   </div>
                     <Link to={`/r/${post?.subrabbit?.name}/post/${post.id}`}>
                       <h1 className='text-lg font-semibold py-2 leading-6 text-gray-900'>
@@ -79,8 +79,8 @@ const Post: FC<PostProps> = ({
                 to={`/r/${post?.subrabbit?.name}/post/${post?.id}`}
                 className='w-fit flex items-center gap-2'>
                 <MessageSquare className='h-4 w-4' />
-                {post?.comments.filter((comment) => !comment.parent_comment).length}
-                {post?.comments.filter((comment) => !comment.parent_comment).length <= 1 ? ' comment' : ' comments'}
+                {post?.comments_count}
+                {post?.comments_count <= 1 ? ' comment' : ' comments'}
               </Link>
             </div>
         </div>

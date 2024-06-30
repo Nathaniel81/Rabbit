@@ -13,9 +13,9 @@ type Author = {
 }
 
 type Comment = {
-    id: string;
+    id: string | undefined;
     text: string;
-    parent_comment?: Comment;
+    parent_comment_id?: string;
     comment_votes: Votes[];
     created_at: string;
     content: any;
@@ -27,6 +27,7 @@ export type Post = {
     title: string;
     author: Author;
     comments: Comment[];
+    comments_count: number;
     content: string;
     subrabbit: SubrabbitData;
     votes: Votes[];

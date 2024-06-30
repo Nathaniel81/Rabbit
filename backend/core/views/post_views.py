@@ -95,17 +95,19 @@ class PostListView(generics.ListAPIView):
         subrabbit_name = self.request.query_params.get('subrabbitName')
         page = self.request.query_params.get('page')
 
+        # Cache key based on user authentication and subrabbit_name
+        cache_key = f'posts:{subrabbit_name}:{user.id if user.is_authenticated else "anon"}:page{page}'
+
         if page == '1':
-            # Retrieve cached posts for the first page if available
-            cached_posts = cache.get(f'posts:{subrabbit_name}:page1')
+            cached_posts = cache.get(cache_key)
             if cached_posts is not None:
                 return cached_posts
+
         posts = self.fetch_posts(subrabbit_name, user)
 
         if page == '1':
-            # Cache the fetched posts for the first page
-            cache.set(f'posts:{subrabbit_name}:page1', posts)
-        
+            cache.set(cache_key, posts)
+
         return posts
 
     def fetch_posts(self, subrabbit_name, user):
@@ -133,15 +135,14 @@ class PostListView(generics.ListAPIView):
             net_votes=F('upvotes') - F('downvotes'),
             num_comments=Count('comments')
         )
-        
+
         # Order by net_votes descending, created_at descending, and num_comments descending
         posts = posts.order_by('-net_votes', '-created_at', '-num_comments')
 
-        return list(posts)
-        posts = posts.order_by('-created_at')
+        posts = posts.select_related('author', 'subrabbit')
+
         return posts
 
-    # Handle GET request to list posts.
     def list(self, request, *args, **kwargs):
         response = super().list(request, *args, **kwargs)
         return response
@@ -153,7 +154,7 @@ class PostDetailView(generics.RetrieveUpdateDestroyAPIView):
     This view allows users to retrieve, update, or delete a specific post by its primary key.
     """
 
-    queryset = Post.objects.all()
+    queryset = Post.objects.select_related('author', 'subrabbit').all()
     serializer_class = PostSerializer
     lookup_url_kwarg = 'pk'
 
@@ -199,6 +200,24 @@ class CreateComment(generics.CreateAPIView):
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+class CommentListView(generics.ListAPIView):
+    """
+    View for listing comments for a specific post.
+    This view allows users to retrieve a list of comments for a given post,
+    ordered by net votes and creation date.
+    """
+
+    serializer_class = CommentSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get_queryset(self):
+        post_id = self.kwargs.get('post_id')
+        comments = Comment.objects.filter(parent_post_id=post_id).annotate(
+            upvotes=Count('comment_votes', filter=Q(comment_votes__type=VoteType.UP)),
+            downvotes=Count('comment_votes', filter=Q(comment_votes__type=VoteType.DOWN))
+        ).annotate(net_votes=F('upvotes') - F('downvotes')).order_by('-net_votes', '-created_at')
+        return comments
 
 class CommentVoteView(APIView):
     """

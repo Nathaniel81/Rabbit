@@ -10,4 +10,4 @@ class User(AbstractUser):
     profile_picture = CloudinaryField('image', null=True, blank=True)
 
     def __str__(self):
-        return self.email
+        return self.username
