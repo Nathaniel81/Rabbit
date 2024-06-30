@@ -73,7 +73,7 @@ class Comment(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     content = models.TextField()
     parent_post = models.ForeignKey(Post, related_name='comments', on_delete=models.CASCADE)
-    parent_comment = models.ForeignKey("Comment", null=True, blank=True, on_delete=models.CASCADE)
+    parent_comment_id = models.IntegerField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
