@@ -36,7 +36,7 @@ const PostComment = ({
   const commentRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const queryKey = ['postDetail'];
+  const queryKey = ['postComments'];
 
   useOnClickOutside(commentRef, () => {
     setIsReplying(false)
