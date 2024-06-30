@@ -36,7 +36,7 @@ const PostComment = ({
   const commentRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const queryKey = ['postComments'];
+  const commentQueryKey = [`postComments ${postId}`];
 
   useOnClickOutside(commentRef, () => {
     setIsReplying(false)
@@ -65,7 +65,7 @@ const PostComment = ({
       })
     },
     onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: queryKey, exact: true })
+        queryClient.invalidateQueries({ queryKey: commentQueryKey, exact: true })
         setInput('')
         setIsReplying(false)
       },

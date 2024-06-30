@@ -55,7 +55,7 @@ class PostSerializer(serializers.ModelSerializer):
     author = UserSerializer(read_only=True)
     comments_count = serializers.SerializerMethodField()
     votes = VoteSerializer(many=True, read_only=True)
-    # subrabbit = SubrabbitSerializer(read_only=True)
+    subrabbit = SubrabbitSerializer(read_only=True)
 
     class Meta:
         model = Post

@@ -19,7 +19,7 @@ interface CreateCommentProps {
 const CreateComment: FC<CreateCommentProps> = ({ postId, replyToId }) => {
   const dispatch = useDispatch<AppDispatch>();
   const queryClient = useQueryClient();
-  const queryKey = [`postDetail ${postId}`];
+  const commentQueryKey = [`postComments ${postId}`];
 
   const { toast } = useToast();
   const [input, setInput] = useState<string>('');
@@ -60,7 +60,7 @@ const CreateComment: FC<CreateCommentProps> = ({ postId, replyToId }) => {
     },
     onSuccess: () => {
       setInput('')
-      queryClient.invalidateQueries({ queryKey: queryKey, exact: true })
+      queryClient.invalidateQueries({ queryKey: commentQueryKey, exact: true })
     },
   })
 
